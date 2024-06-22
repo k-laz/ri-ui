@@ -4,9 +4,15 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite --host",
+    "start": "node server/index.js",
+    "start:dev": "nodemon server/index.js",
+    "dev": "bash injectenv.sh && vite --host",
+    "prebuild": "bash prebuild.sh",
     "build": "tsc && vite build",
-    "preview": "vite preview"
+    "test": "craco test",
+    "eject": "react-scripts eject",
+    "lint": "eslint src --ext .js --cache --max-warnings=0",
+    "bundlewatch": "bundlewatch --config .bundlewatch.config.json"
   },
   "dependencies": {
     "@headlessui/react": "2.0.4",

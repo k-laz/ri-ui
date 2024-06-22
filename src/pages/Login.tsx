@@ -18,15 +18,30 @@ export default function LogIn() {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError(null);
+    await login(email, password);
 
-    try {
-      await login(email, password);
-      navigate('/dashboard');
-    } catch (err) {
-      setError(
-        'Failed to log in. Please check your credentials and try again.',
-      );
-    }
+    // try {
+    //   await login(email, password);
+    // } catch (error) {
+    //   setError(
+    //     'Failed to log in. Please check your credentials and try again.',
+    //   );
+    //   // Handle error appropriately (e.g., show error message)
+    //   if (error instanceof Error) {
+    //     // Example: You can extract and handle specific Firebase error codes
+    //     switch (error.cause) {
+    //       case 'auth/wrong-password':
+    //         console.error('Wrong password');
+    //         break;
+    //       case 'auth/user-not-found':
+    //         console.error('User not found');
+    //         break;
+    //       // Add other cases as needed
+    //       default:
+    //         console.error('Login error:', error.message);
+    //     }
+    //   }
+    // }
   };
 
   return (
