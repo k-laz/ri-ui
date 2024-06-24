@@ -7,10 +7,12 @@ import {
   GoogleAuthProvider,
   signInWithPopup,
   User,
+  AuthError,
 } from 'firebase/auth';
 import { auth } from '../firebase.config.ts';
 import { useNavigate } from 'react-router-dom';
 
+// Define a type for the context value
 interface AuthContextType {
   firebaseCurrentUser: User | null;
   userData: unknown;
@@ -20,6 +22,7 @@ interface AuthContextType {
   logout: () => Promise<void>;
 }
 
+// Initial user data structure
 const initialUserData = {
   isReady: false,
   displayName: '',
@@ -29,14 +32,39 @@ const initialUserData = {
   image: null,
 };
 
+// Create the context
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+// Hook to use the context
 export const useAuth = () => useContext(AuthContext);
 
+// Error mapping function
+const getErrorMessage = (errorCode: string): string => {
+  switch (errorCode) {
+    case 'auth/user-not-found':
+      return 'No user found with this email address.';
+    case 'auth/invalid-credential':
+      return 'Invalid credentials, check your email or password';
+    case 'auth/wrong-password':
+      return 'Incorrect password. Please try again.';
+    case 'auth/invalid-email':
+      return 'Invalid email address. Please check and try again.';
+    case 'auth/email-already-in-use':
+      return 'Email is already in use. Please use a different email.';
+    case 'auth/weak-password':
+      return 'Password is too weak. Please choose a stronger password.';
+    case 'auth/network-request-failed':
+      return 'Network error. Please check your internet connection and try again.';
+    default:
+      return 'An error occurred. Please try again later.';
+  }
+};
+
+// AuthProvider component
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
-  const [currentUser, setCurrentUser] = useState(auth.currentUser);
+  const [currentUser, setCurrentUser] = useState<User | null>(auth.currentUser);
   const navigate = useNavigate();
   const [userData, setUserData] = useState(() => {
     const data = sessionStorage.getItem('userData');
@@ -45,25 +73,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const login = async (email: string, password: string): Promise<void> => {
     try {
-      const user = await signInWithEmailAndPassword(auth, email, password);
-      console.log(user);
+      await signInWithEmailAndPassword(auth, email, password);
       navigate('/dashboard');
-    } catch (error) {
-      console.error('Failed to login:', error);
-      // Handle error appropriately (e.g., show error message)
+    } catch (error: unknown) {
       if (error instanceof Error) {
-        // Example: You can extract and handle specific Firebase error codes
-        switch (error.cause) {
-          case 'auth/wrong-password':
-            console.error('Wrong password');
-            break;
-          case 'auth/user-not-found':
-            console.error('User not found');
-            break;
-          // Add other cases as needed
-          default:
-            console.error('Login error:', error.message);
-        }
+        const firebaseError = error as AuthError;
+        const errorMessage = getErrorMessage(firebaseError.code);
+        console.error('Failed to login:', errorMessage);
+        throw new Error(errorMessage);
+      } else {
+        // Handle unexpected error types
+        console.error('Unexpected error:', error);
+        throw new Error(
+          'An unexpected error occurred. Please try again later.',
+        );
       }
     }
   };
@@ -73,9 +96,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     try {
       await signInWithPopup(auth, provider);
       navigate('/dashboard');
-    } catch (error) {
-      console.error('Failed to login with Google:', error);
-      // Handle error appropriately (e.g., show error message)
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        const firebaseError = error as AuthError;
+        const errorMessage = getErrorMessage(firebaseError.code);
+        console.error('Failed to login with google:', errorMessage);
+        throw new Error(errorMessage);
+      } else {
+        // Handle unexpected error types
+        console.error('Unexpected error:', error);
+        throw new Error(
+          'An unexpected error occurred. Please try again later.',
+        );
+      }
     }
   };
 
@@ -83,9 +116,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     try {
       await createUserWithEmailAndPassword(auth, email, password);
       navigate('/dashboard');
-    } catch (error) {
-      console.error('Failed to signup:', error);
-      // Handle error appropriately (e.g., show error message)
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        const firebaseError = error as AuthError;
+        const errorMessage = getErrorMessage(firebaseError.code);
+        console.error('Failed to sign up:', errorMessage);
+        throw new Error(errorMessage);
+      } else {
+        // Handle unexpected error types
+        console.error('Unexpected error:', error);
+        throw new Error(
+          'An unexpected error occurred. Please try again later.',
+        );
+      }
     }
   };
 
@@ -94,9 +137,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       await signOut(auth);
       setUserData(initialUserData);
       navigate('/');
-    } catch (error) {
-      console.error('Failed to logout:', error);
-      // Handle error appropriately (e.g., show error message)
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        const firebaseError = error as AuthError;
+        const errorMessage = getErrorMessage(firebaseError.code);
+        console.error('Failed to log out:', errorMessage);
+        throw new Error(errorMessage);
+      } else {
+        // Handle unexpected error types
+        console.error('Unexpected error:', error);
+        throw new Error(
+          'An unexpected error occurred. Please try again later.',
+        );
+      }
     }
   };
 
@@ -104,7 +157,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     const authObserver = auth.onAuthStateChanged((user) =>
       setCurrentUser(user),
     );
-
     return authObserver;
   }, []);
 

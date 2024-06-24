@@ -1,10 +1,8 @@
 import React, { useState } from 'react';
 import { useAuth } from '../hooks/AuthProvider'; // Update with the correct path
-import { useNavigate } from 'react-router-dom';
 
 export default function LogIn() {
   const auth = useAuth();
-  const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
@@ -18,30 +16,15 @@ export default function LogIn() {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError(null);
-    await login(email, password);
-
-    // try {
-    //   await login(email, password);
-    // } catch (error) {
-    //   setError(
-    //     'Failed to log in. Please check your credentials and try again.',
-    //   );
-    //   // Handle error appropriately (e.g., show error message)
-    //   if (error instanceof Error) {
-    //     // Example: You can extract and handle specific Firebase error codes
-    //     switch (error.cause) {
-    //       case 'auth/wrong-password':
-    //         console.error('Wrong password');
-    //         break;
-    //       case 'auth/user-not-found':
-    //         console.error('User not found');
-    //         break;
-    //       // Add other cases as needed
-    //       default:
-    //         console.error('Login error:', error.message);
-    //     }
-    //   }
-    // }
+    try {
+      await login(email, password);
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setError(err.message); // Display the user-friendly error message
+      } else {
+        setError('An unexpected error occurred. Please try again later.');
+      }
+    }
   };
 
   return (
@@ -124,7 +107,6 @@ export default function LogIn() {
                 onClick={async () => {
                   try {
                     await loginWithGoogle();
-                    navigate('/dashboard');
                   } catch (err) {
                     setError('Failed to log in with Google.');
                   }

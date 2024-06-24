@@ -1,4 +1,24 @@
+import { useAuth } from '@/hooks/AuthProvider';
+import { useState } from 'react';
+
 export default function SignUp() {
+  const auth = useAuth();
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState<string | null>(null);
+
+  if (!auth) {
+    throw new Error('useAuth must be used within an AuthProvider');
+  }
+
+  const { signup } = auth;
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setError(null);
+    await signup(email, password);
+  };
+
   return (
     <div className="mx-auto flex flex-col items-center justify-center py-8 sm:mt-16 sm:px-6">
       <div className="w-full  sm:max-w-md md:mt-0 xl:p-0">
@@ -6,7 +26,10 @@ export default function SignUp() {
           <h2 className="text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">
             Create an account
           </h2>
-          <form className="space-y-4 md:space-y-6" action="#">
+          {error && (
+            <div className="text-center text-sm text-red-500">{error}</div>
+          )}
+          <form className="space-y-4 md:space-y-6" onSubmit={handleSubmit}>
             <div>
               <label
                 htmlFor="email"
@@ -20,6 +43,8 @@ export default function SignUp() {
                 id="email"
                 className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-primary focus:ring-primary "
                 placeholder="name@company.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
               />
             </div>
             <div>
@@ -35,6 +60,8 @@ export default function SignUp() {
                 id="password"
                 placeholder="••••••••"
                 className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-primary focus:ring-primary"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
               />
             </div>
             <div className="flex items-start">
