@@ -1,9 +1,10 @@
 import { Navigate, Outlet } from 'react-router-dom';
-import { useAuth } from '../hooks/AuthProvider';
+import { useAuth } from '@/hooks/AuthProvider';
 
 const PrivateRoute = () => {
-  const auth = useAuth();
-  if (!auth?.userData) return <Navigate to="/login" />;
+  const { firebaseCurrentUser } = useAuth();
+
+  if (!firebaseCurrentUser) return <Navigate to="/login" />;
   return <Outlet />;
 };
 

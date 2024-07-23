@@ -1,4 +1,4 @@
-// AuthProvider.tsx
+// src/AuthProvider.tsx
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import {
   signInWithEmailAndPassword,
@@ -9,36 +9,39 @@ import {
   User,
   AuthError,
 } from 'firebase/auth';
-import { auth } from '../firebase.config.ts';
+import { auth } from '../firebase.config';
 import { useNavigate } from 'react-router-dom';
+import { createUserProfile, updateUserFilter, fetchUserData } from '../api';
+import { UserData, UserFilter } from '../types';
 
-// Define a type for the context value
 interface AuthContextType {
   firebaseCurrentUser: User | null;
-  userData: unknown;
+  userData: UserData;
   login: (email: string, password: string) => Promise<void>;
   loginWithGoogle: () => Promise<void>;
   signup: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
+  updateProfile: (userId: string, filter: UserFilter) => Promise<void>;
+  refreshUser: unknown;
+  notificationModalOpen: unknown;
+  setNotificationModalOpen: unknown;
+  notificationTitle: unknown;
+  setNotificationTitle: unknown;
+  firstTimeSignUp: boolean;
 }
 
-// Initial user data structure
-const initialUserData = {
-  isReady: false,
-  displayName: '',
-  formattedAffiliation: '',
-  affiliation: '',
-  faculty: '',
-  image: null,
-};
+const initialUserData = {};
 
-// Create the context
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-// Hook to use the context
-export const useAuth = () => useContext(AuthContext);
+export const useAuth = (): AuthContextType => {
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error('useAuth must be used within an AuthProvider');
+  }
+  return context;
+};
 
-// Error mapping function
 const getErrorMessage = (errorCode: string): string => {
   switch (errorCode) {
     case 'auth/user-not-found':
@@ -60,16 +63,20 @@ const getErrorMessage = (errorCode: string): string => {
   }
 };
 
-// AuthProvider component
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
-  const [currentUser, setCurrentUser] = useState<User | null>(auth.currentUser);
   const navigate = useNavigate();
+  const [currentUser, setCurrentUser] = useState<User | null>(auth.currentUser);
+  const [refreshUser, setRefreshUser] = useState(Math.random());
+  const [firstTimeSignUp, setFirstTimeSignUp] = useState(false);
   const [userData, setUserData] = useState(() => {
     const data = sessionStorage.getItem('userData');
     return data ? JSON.parse(data) : initialUserData;
   });
+  const [notificationModalOpen, setNotificationModalOpen] = useState(false);
+  const [notificationTitle, setNotificationTitle] = useState('');
+  const [loading, setLoading] = useState(true);
 
   const login = async (email: string, password: string): Promise<void> => {
     try {
@@ -82,7 +89,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         console.error('Failed to login:', errorMessage);
         throw new Error(errorMessage);
       } else {
-        // Handle unexpected error types
         console.error('Unexpected error:', error);
         throw new Error(
           'An unexpected error occurred. Please try again later.',
@@ -103,7 +109,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         console.error('Failed to login with google:', errorMessage);
         throw new Error(errorMessage);
       } else {
-        // Handle unexpected error types
         console.error('Unexpected error:', error);
         throw new Error(
           'An unexpected error occurred. Please try again later.',
@@ -114,8 +119,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const signup = async (email: string, password: string): Promise<void> => {
     try {
-      await createUserWithEmailAndPassword(auth, email, password);
-      navigate('/dashboard');
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password,
+      );
+      const firebaseUId = userCredential.user.uid;
+      await createUserProfile(firebaseUId, email);
+      setFirstTimeSignUp(true);
+      navigate('/filter/setup');
     } catch (error: unknown) {
       if (error instanceof Error) {
         const firebaseError = error as AuthError;
@@ -123,7 +135,25 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         console.error('Failed to sign up:', errorMessage);
         throw new Error(errorMessage);
       } else {
-        // Handle unexpected error types
+        console.error('Unexpected error:', error);
+        throw new Error(
+          'An unexpected error occurred. Please try again later.',
+        );
+      }
+    }
+  };
+
+  const updateProfile = async (
+    userId: string,
+    filter: UserFilter,
+  ): Promise<void> => {
+    try {
+      await updateUserFilter(userId, filter);
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        console.error('Failed to update profile:', error.message);
+        throw new Error('Failed to update profile');
+      } else {
         console.error('Unexpected error:', error);
         throw new Error(
           'An unexpected error occurred. Please try again later.',
@@ -144,7 +174,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         console.error('Failed to log out:', errorMessage);
         throw new Error(errorMessage);
       } else {
-        // Handle unexpected error types
         console.error('Unexpected error:', error);
         throw new Error(
           'An unexpected error occurred. Please try again later.',
@@ -154,11 +183,42 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   };
 
   useEffect(() => {
-    const authObserver = auth.onAuthStateChanged((user) =>
-      setCurrentUser(user),
-    );
+    const authObserver = auth.onAuthStateChanged((user) => {
+      setCurrentUser(user);
+      setLoading(false);
+    });
     return authObserver;
   }, []);
+
+  useEffect(() => {
+    const userDataCache = JSON.parse(
+      sessionStorage.getItem('userData') || '{}',
+    );
+
+    if (currentUser && !(userDataCache?.isReady ?? false)) {
+      currentUser.getIdToken().then(async (token) => {
+        await fetchUserData(token)
+          .then((data: UserData) => {
+            setUserData({
+              isReady: true,
+              ...data,
+            });
+
+            if (firstTimeSignUp) {
+              setNotificationModalOpen(true);
+              setNotificationTitle('Sign up successful!');
+            }
+          })
+          .catch((error) => {
+            console.error('Failed to fetch user data:', error);
+          });
+      });
+    }
+  }, [currentUser, firstTimeSignUp, refreshUser]);
+
+  useEffect(() => {
+    sessionStorage.setItem('userData', JSON.stringify(userData));
+  }, [userData]);
 
   const value: AuthContextType = {
     userData,
@@ -167,7 +227,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     login,
     signup,
     logout,
+    updateProfile,
+    refreshUser: () => setRefreshUser(Math.random()),
+    notificationModalOpen,
+    setNotificationModalOpen,
+    firstTimeSignUp,
+
+    notificationTitle,
+    setNotificationTitle,
   };
 
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+  return (
+    <AuthContext.Provider value={value}>
+      {!loading && children}
+    </AuthContext.Provider>
+  );
 };

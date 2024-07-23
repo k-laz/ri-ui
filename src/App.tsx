@@ -14,25 +14,24 @@ import { AuthProvider } from './hooks/AuthProvider';
 function App() {
   return (
     <Router>
-      <Navbar />
-
       <main className="relative isolate h-dvh bg-background px-6 pt-20 lg:px-8">
         <AuthProvider>
+          <Navbar />
           <Routes>
             <Route path="/" element={<Hero />} />
             <Route path="/login" element={<LogIn />} />
             <Route path="/signup" element={<SignUp />} />
-            <Route path="/signup/filter-setup" element={<FilterSetup />} />
             <Route path="/blog" element={<Blog />} />
             <Route path="/about" element={<About />} />
             <Route element={<PrivateRoute />}>
               <Route path="/dashboard" element={<Dashboard />} />
             </Route>
+            <Route element={<PrivateRoute />}>
+              <Route path="/filter/setup" element={<FilterSetup />} />
+            </Route>
           </Routes>
         </AuthProvider>
       </main>
-
-      {/* <footer>some footer</footer> */}
     </Router>
   );
 }

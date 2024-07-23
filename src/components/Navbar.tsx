@@ -1,8 +1,8 @@
 import { NavLink } from 'react-router-dom';
-import { useAuth } from '../hooks/LocalAuthProvider';
-import { Dialog, DialogPanel } from '@headlessui/react';
+import { Button, Dialog, DialogPanel } from '@headlessui/react';
 import { useState } from 'react';
 import logo from '../assets/images/RI-Logo-Simple.svg';
+import { useAuth } from '@/hooks/AuthProvider';
 
 const navigation = [
   { name: 'Dashboard', href: '/dashboard' },
@@ -13,8 +13,10 @@ const navigation = [
 ];
 
 const Navbar = () => {
-  const auth = useAuth();
+  const { firebaseCurrentUser, logout } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  firebaseCurrentUser?.getIdToken().then((data) => console.log(data));
 
   return (
     <header className="absolute inset-x-0 top-0 z-50">
@@ -60,14 +62,17 @@ const Navbar = () => {
             </a>
           ))}
         </div>
-        {auth.token ? (
+        {firebaseCurrentUser ? (
           <div className="hidden lg:flex lg:flex-1 lg:justify-end">
-            <NavLink
-              to="/profile"
+            <Button
               className="text-sm font-semibold leading-6 text-gray-900 hover:text-secondary"
+              onClick={() => {
+                setMobileMenuOpen(false);
+                logout();
+              }}
             >
-              Profile <span aria-hidden="true">&rarr;</span>
-            </NavLink>
+              Log out
+            </Button>
           </div>
         ) : (
           <div className="hidden lg:flex lg:flex-1 lg:justify-end">
@@ -130,15 +135,17 @@ const Navbar = () => {
                   </NavLink>
                 ))}
               </div>
-              {auth.token ? (
+              {firebaseCurrentUser ? (
                 <div className="py-6">
-                  <NavLink
+                  <Button
                     className="-mx-3 block rounded-lg px-3 py-2.5 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50"
-                    to="/signin"
-                    onClick={() => setMobileMenuOpen(false)}
+                    onClick={() => {
+                      setMobileMenuOpen(false);
+                      logout();
+                    }}
                   >
-                    Profile
-                  </NavLink>
+                    Log out
+                  </Button>
                 </div>
               ) : (
                 <div className="py-6">

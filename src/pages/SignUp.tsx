@@ -16,7 +16,15 @@ export default function SignUp() {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError(null);
-    await signup(email, password);
+    try {
+      await signup(email, password);
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setError(err.message); // Display the user-friendly error message
+      } else {
+        setError('An unexpected error occurred. Please try again later.');
+      }
+    }
   };
 
   return (
