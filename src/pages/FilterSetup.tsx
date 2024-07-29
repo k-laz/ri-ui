@@ -114,6 +114,9 @@ export default function FilterSetup() {
       }}
     >
       <div className="mt-12 lg:mt-24">
+        <h1 className="mb-6 text-center text-xl font-bold text-gray-900 lg:mt-16">
+          Filter Setup
+        </h1>
         <h2 className="text-center text-base font-semibold leading-7 text-gray-900 lg:mt-16">
           {steps[currentStep]}
         </h2>

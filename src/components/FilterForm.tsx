@@ -1,16 +1,15 @@
+import { UserFilter } from '@/types';
 import { Formik, Field, Form } from 'formik';
 import * as Yup from 'yup';
 
-const FilterForm = () => {
-  const initialValues = {
-    price_limit: 0,
-    furnished: false,
-    min_beds: 0,
-    max_beds: 0,
-    min_baths: 0,
-    max_baths: 0,
-    move_in_date: '',
-  };
+interface FilterFormProps {
+  filter: UserFilter;
+}
+
+const FilterForm: React.FC<FilterFormProps> = (filterFormProps) => {
+  const initialValues = filterFormProps.filter;
+
+  console.log(initialValues);
 
   const validationSchema = Yup.object({
     price_limit: Yup.number().required('Required'),
