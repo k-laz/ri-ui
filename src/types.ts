@@ -19,12 +19,11 @@ export type UserFilter = {
   id: number;
   userid: number;
   price_limit: number;
-  move_in_date: string;
+  move_in_date: Date;
   length_of_stay: 4 | 8 | 12;
-  min_baths: (0 | 1 | 2 | 3 | 4)[];
-  max_baths: (0 | 1 | 2 | 3 | 4)[];
-  min_beds: (0 | 1 | 2 | 3 | 4)[];
-  max_beds: (0 | 1 | 2 | 3 | 4)[];
+  num_baths: (0 | 1 | 2 | 3 | 4)[];
+  num_beds: (0 | 1 | 2 | 3 | 4)[];
+  num_parking: (0 | 1 | 2 | 3 | 4)[];
   furnished: boolean;
   gender_preference: 'male' | 'female' | 'any';
 };

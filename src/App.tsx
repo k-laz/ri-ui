@@ -1,13 +1,5 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import {
-  Hero,
-  Dashboard,
-  LogIn,
-  SignUp,
-  Blog,
-  About,
-  FilterSetup,
-} from './pages/';
+import { Hero, Dashboard, LogIn, SignUp, Blog, About } from './pages/';
 import { PrivateRoute, Navbar } from './components/';
 import { AuthProvider } from './hooks/AuthProvider';
 
@@ -25,9 +17,6 @@ function App() {
             <Route path="/about" element={<About />} />
             <Route element={<PrivateRoute />}>
               <Route path="/dashboard" element={<Dashboard />} />
-            </Route>
-            <Route element={<PrivateRoute />}>
-              <Route path="/filter/setup" element={<FilterSetup />} />
             </Route>
           </Routes>
         </AuthProvider>
