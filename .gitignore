@@ -1,8 +1,6 @@
 # Created by https://www.toptal.com/developers/gitignore/api/react,node,yarn,visualstudiocode
 # Edit at https://www.toptal.com/developers/gitignore?templates=react,node,yarn,visualstudiocode
 
-JOURNAL.md
-
 environment/env.sh
 
 ### Node ###

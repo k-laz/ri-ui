@@ -33,7 +33,6 @@ const Filter = () => {
   if (!auth) {
     alert('User not logged in!');
   }
-  console.log(auth.userData);
   const initialValues: Partial<UserFilter> = {
     price_limit: auth.userData?.filter?.price_limit ?? 0,
     move_in_date: auth.userData?.filter?.move_in_date ?? '',
