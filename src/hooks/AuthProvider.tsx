@@ -12,7 +12,7 @@ import {
 import { auth } from '../firebase.config';
 import { useNavigate } from 'react-router-dom';
 import { createUserProfile, updateUserFilter, fetchUserData } from '../api';
-import { UserData, UserFilter } from '../types';
+import { RawUserData, UserData, UserFilter } from '../types';
 
 interface AuthContextType {
   firebaseCurrentUser: User | null;
@@ -198,10 +198,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     if (currentUser && !(userDataCache?.isReady ?? false)) {
       currentUser.getIdToken().then(async (token) => {
         await fetchUserData(token)
-          .then((data: UserData) => {
+          .then((data: RawUserData) => {
             setUserData({
               isReady: true,
-              ...data,
+              filter: data.UserFilter,
+              listings: data.Listings,
+              email: data.email,
+              id: data.id,
             });
 
             if (firstTimeSignUp) {

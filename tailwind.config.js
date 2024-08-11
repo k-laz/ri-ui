@@ -5,9 +5,7 @@ export default {
       colors: {
         primary: '#19535F',
         focus: '#19535F',
-        // background: '#F0F3F5',
         background: '#FFFFFF',
-        // primary: '#00AF8D', 0B7A75 5DD9C1 19535F D7C9AA F0F3F5 7B2D26  | https://coolors.co/19535f-0b7a75-d7c9aa-7b2d26-f0f3f5
         primary_light: '#1ab798',
         secondary: '#0B7A75',
         tertiery: '#EAFCFC',

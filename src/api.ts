@@ -1,9 +1,8 @@
 // src/api.ts
-const API_URL = 'http://localhost:3000';
+import { API_URL } from './constants';
+import { UserFilter, RawUserData } from './types';
 
-import { UserFilter, UserData } from './types';
-
-export const fetchUserData = async (token: string): Promise<UserData> => {
+export const fetchUserData = async (token: string): Promise<RawUserData> => {
   try {
     const response = await fetch(`${API_URL}/users/me`, {
       method: 'GET',

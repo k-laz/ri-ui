@@ -1,12 +1,15 @@
 import { useAuth } from '@/hooks/AuthProvider';
 import { UserFilter } from '@/types';
+import { Switch } from '@headlessui/react';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
+import { CheckIcon, XMarkIcon } from '@heroicons/react/24/solid';
+import { API_URL } from '@/constants';
 
 const validationSchema = Yup.object({
   price_limit: Yup.number(),
   move_in_date: Yup.date(),
-  length_of_stay: Yup.string().oneOf(['4', '8', '12']),
+  length_of_stay: Yup.number().oneOf([4, 8, 12]),
   num_baths: Yup.array().of(
     Yup.number().oneOf([0, 1, 2, 3, 4], 'Invalid number of bathrooms'),
   ),
@@ -17,6 +20,7 @@ const validationSchema = Yup.object({
     Yup.number().oneOf([0, 1, 2, 3, 4], 'Invalid number of parking spots'),
   ),
   furnished: Yup.boolean(),
+  pet_friendly: Yup.boolean(),
   gender_preference: Yup.string().oneOf(
     ['male', 'female', 'any'],
     'Invalid gender selection',
@@ -25,9 +29,11 @@ const validationSchema = Yup.object({
 
 const Filter = () => {
   const auth = useAuth();
+
   if (!auth) {
     alert('User not logged in!');
   }
+  console.log(auth.userData);
   const initialValues: Partial<UserFilter> = {
     price_limit: auth.userData?.filter?.price_limit ?? 0,
     move_in_date: auth.userData?.filter?.move_in_date ?? '',
@@ -36,13 +42,31 @@ const Filter = () => {
     num_beds: auth.userData?.filter?.num_beds ?? [],
     num_parking: auth.userData?.filter?.num_parking ?? [],
     furnished: auth.userData?.filter?.furnished ?? false,
+    pet_friendly: auth.userData?.filter?.pet_friendly ?? false,
     gender_preference: auth.userData?.filter?.gender_preference ?? '',
   };
 
-  const handleSubmit = (values: Partial<UserFilter>) => {
-    alert('Filter updated successfully!');
-    // You can handle form submission here
-    console.log('Filter updated successfully!', values);
+  const handleSubmit = async (values: Partial<UserFilter>) => {
+    try {
+      console.log(values);
+      const response = await fetch(`${API_URL}/users/me/filter`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(values),
+      });
+
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+
+      alert('Filter updated successfully!');
+      console.log('Filter updated successfully!', values);
+    } catch (error) {
+      console.error('Error updating filter:', error);
+      alert('There was an error updating the filter. Please try again.');
+    }
   };
 
   return (
@@ -52,13 +76,13 @@ const Filter = () => {
       onSubmit={handleSubmit}
     >
       {({ values, setFieldValue }) => (
-        <div className="mt-8 lg:mt-24">
-          <h2 className="text-center text-base font-semibold leading-7 text-gray-900 lg:mt-8">
-            Filter Setup
+        <div className="mt-8 lg:mt-20">
+          <h2 className="text-center  font-semibold leading-7 text-gray-900 lg:mt-8">
+            Your Filter
           </h2>
           <Form className="mx-auto w-full max-w-5xl rounded-lg md:p-10">
-            <div className="overflow-y-scroll border-b border-gray-900/10 p-3 pb-12 ">
-              <div className="relative mt-10 grid grid-cols-1 gap-x-6 gap-y-4 sm:grid-cols-10 sm:gap-y-8 md:gap-x-16">
+            <div className="overflow-y-scroll border-b border-gray-900/10 p-3 lg:mx-10">
+              <div className="relative mt-10 grid grid-cols-1 gap-x-6 gap-y-4 sm:grid-cols-10 sm:gap-y-8 md:gap-x-16 lg:mb-4">
                 <>
                   {/* Budget Price Cap Slider */}
                   <div className="sm:col-span-5">
@@ -86,7 +110,7 @@ const Filter = () => {
                           min="0"
                           max="5000"
                           step="10"
-                          className="ml-4 min-w-20 truncate rounded-md border-2 border-primary px-2 py-1 text-left"
+                          className="ml-4 min-w-20 truncate rounded-md border-2 border-primary p-1 text-center lg:pl-4"
                           value={values.price_limit}
                           onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                             setFieldValue(
@@ -143,15 +167,10 @@ const Filter = () => {
                         className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                       >
                         <option value="">Select...</option>
-                        <option value="4">4 months</option>
-                        <option value="8">8 months</option>
-                        <option value="12">12 months</option>
+                        <option value={4}>4 months</option>
+                        <option value={8}>8 months</option>
+                        <option value={12}>12 months</option>
                       </Field>
-                      {/* <ErrorMessage
-                        name="length_of_stay"
-                        component="div"
-                        className="mt-1 text-sm text-red-600"
-                      /> */}
                     </div>
                   </div>
 
@@ -388,12 +407,64 @@ const Filter = () => {
                       className="mt-1 text-sm text-red-600"
                     /> */}
                   </div>
+
+                  <hr className="md:hidden"></hr>
+
+                  {/* Furnished Toggle */}
+                  <div className="sm:col-span-2">
+                    <label
+                      htmlFor="furnished"
+                      className="block text-sm font-medium leading-6 text-gray-900"
+                    >
+                      Popular Filters
+                    </label>
+                    <Switch
+                      checked={values.furnished}
+                      onChange={() =>
+                        setFieldValue('furnished', !values.furnished)
+                      }
+                      className={`mt-2 flex items-center rounded-full px-4 py-2 ${
+                        values.furnished
+                          ? 'bg-primary text-white'
+                          : 'bg-gray-200 text-gray-700'
+                      }`}
+                    >
+                      {values.furnished ? (
+                        <CheckIcon className="h-5 w-5" />
+                      ) : (
+                        <XMarkIcon className="h-5 w-5" />
+                      )}
+                      <span className="ml-2">Furnished</span>
+                    </Switch>
+                  </div>
+
+                  {/* Pet Friendly Toggle */}
+                  <div className="flex items-center sm:col-span-1">
+                    <Switch
+                      checked={values.pet_friendly}
+                      onChange={() =>
+                        setFieldValue('pet_friendly', !values.pet_friendly)
+                      }
+                      className={`flex items-center rounded-full px-4 py-2 md:mt-8 ${
+                        values.pet_friendly
+                          ? 'bg-primary text-white'
+                          : 'bg-gray-200 text-gray-700'
+                      }`}
+                    >
+                      {values.pet_friendly ? (
+                        <CheckIcon className="h-5 w-5" />
+                      ) : (
+                        <XMarkIcon className="h-5 w-5" />
+                      )}
+                      <span className="ml-2">Pets</span>
+                    </Switch>
+                  </div>
                 </>
               </div>
             </div>
             <button
               type="submit"
-              className="my-4 w-full rounded bg-blue-500 py-2 text-white"
+              className="my-4 w-full rounded bg-primary py-2 text-white hover:bg-secondary lg:my-8"
             >
               Update
             </button>

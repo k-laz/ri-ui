@@ -1,5 +1,15 @@
 // src/types.ts
 
+export type RawUserData = {
+  id: string;
+  updatedAt: string;
+  createdAt: string;
+  firebaseUId: string;
+  email: string;
+  UserFilter: UserFilter;
+  Listings: Listing[];
+};
+
 export type UserData = {
   id: string; // Assuming an ID field
   email: string;
@@ -25,6 +35,7 @@ export type UserFilter = {
   num_beds: (0 | 1 | 2 | 3 | 4)[];
   num_parking: (0 | 1 | 2 | 3 | 4)[];
   furnished: boolean;
+  pet_friendly: boolean;
   gender_preference: 'male' | 'female' | 'any';
 };
 
