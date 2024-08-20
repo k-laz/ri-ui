@@ -4,58 +4,109 @@ export default function About() {
       <div className="mx-auto max-w-7xl px-6 lg:px-8"></div>
       <div>
 
-        <h1 className="text-4xl font-bold tracking-tight text-gray-900">About Us</h1>
+        <h1 className="text-4xl font-bold tracking-tight text-gray-900">Frequently Asked Questions</h1>
         <br></br>
 
         <section>
-          <h1 className="text-2xl font-bold tracking-tight text-gray-900">Our Mission</h1>
+          <h1 className="text-2xl font-bold tracking-tight text-gray-900">What is this web app for?</h1>
           <p className="mt-6 text-lg leading-8 text-gray-600">
-            At <strong>Rental Insight</strong>, our mission is to simplify the process of finding on-campus housing.
-            We understand that searching for the perfect place to live while attending school can be overwhelming, so we created a tool that makes the process as stress-free as possible.
-            Our goal is to connect students with housing options that meet their specific needs and preferences, making campus life more comfortable and enjoyable.
+            This web app helps you find on-campus housing that meets your specific needs. You can set custom filters based on your preferences, and we’ll send you the most relevant housing options directly to your inbox in a newsletter.
           </p>
         </section>
         <br></br>
+
         <section>
-          <h1 className="text-2xl font-bold tracking-tight text-gray-900">What We Do</h1>
+          <h1 className="text-2xl font-bold tracking-tight text-gray-900">How do I create an account?</h1>
           <p className="mt-6 text-lg leading-8 text-gray-600">
-            We provide a platform where students can easily browse, filter, and discover housing options that suit their unique requirements.
-            By leveraging the power of data scraping and custom filters, our app delivers personalized housing recommendations straight to your inbox.
-            Whether you're looking for a quiet single room, a place close to the gym, or a budget-friendly option, we've got you covered.
+            To create an account, click on the "Sign Up" button on the homepage. Fill in your basic information, set your preferences, and you'll be ready to start receiving personalized housing options.
           </p>
         </section>
         <br></br>
+
         <section>
-          <h1 className="text-2xl font-bold tracking-tight text-gray-900">How It Works</h1>
+          <h1 className="text-2xl font-bold tracking-tight text-gray-900">What kind of filters can I set?</h1>
           <p className="mt-6 text-lg leading-8 text-gray-600">
-            Our app scrapes data from a variety of official campus housing resources to ensure you have access to the most current and comprehensive listings available.
-            You set your preferences—such as price range, room type, amenities, and more—and we do the rest.
-            Our system continuously scans for new listings that match your criteria and sends them directly to you via a personalized newsletter.
+            You can filter housing options based on a variety of criteria, including:
+          </p>
+          <ul className="mt-6 text-lg leading-8 text-gray-600">
+            <li>- Max Price</li>
+            <li>- Move-In Date</li>
+            <li>- Gender Preference</li>
+            <li>- Number of Bedrooms and Bathrooms</li>
+            <li>- Parking</li>
+            <li>And more...</li>
+          </ul>
+        </section>
+        <br></br>
+
+        {/* <section>
+          <h1 className="text-2xl font-bold tracking-tight text-gray-900">4. How often will I receive the newsletter?</h1>
+          <p className="mt-6 text-lg leading-8 text-gray-600">
+            You can choose how frequently you want to receive the newsletter when setting up your preferences. Options include daily, weekly, or monthly updates.
+          </p>
+        </section>
+        <br></br> */}
+
+        <section>
+          <h1 className="text-2xl font-bold tracking-tight text-gray-900">Can I update my filters after setting them?</h1>
+          <p className="mt-6 text-lg leading-8 text-gray-600">
+            Yes, you can update your filters anytime by logging into your account and adjusting your preferences. Your newsletter will then reflect your updated criteria.
           </p>
         </section>
         <br></br>
+
         <section>
-          <h1 className="text-2xl font-bold tracking-tight text-gray-900">Why We're Different</h1>
+          <h1 className="text-2xl font-bold tracking-tight text-gray-900">What if there are no housing options that match my filters?</h1>
           <p className="mt-6 text-lg leading-8 text-gray-600">
-            We believe that finding the right housing should be tailored to you.
-            Unlike other platforms that give you a generic list of options, our app puts you in control by allowing you to customize your search.
-            We also keep you informed with real-time updates, so you never miss out on the perfect place.
+            If no options match your filters, you’ll receive a notification in your newsletter letting you know. We’ll continue to search and update you as soon as a match becomes available.
           </p>
         </section>
         <br></br>
+
         <section>
-          <h1 className="text-2xl font-bold tracking-tight text-gray-900">Our Team</h1>
+          <h1 className="text-2xl font-bold tracking-tight text-gray-900">How is the housing information sourced?</h1>
           <p className="mt-6 text-lg leading-8 text-gray-600">
-            We are a passionate group of students and professionals who have experienced the challenges of finding campus housing firsthand.
-            Our team is dedicated to making this process easier and more efficient for everyone.
-            We combine expertise in technology, design, and student life to create a service that truly understands and meets the needs of students.
+            Our app scrapes data from various official campus housing websites and databases to bring you the most up-to-date and comprehensive listings available.
           </p>
         </section>
         <br></br>
-        <section>
-          <h1 className="text-2xl font-bold tracking-tight text-gray-900">Sign Up Today</h1>
+
+        {/* <section>
+          <h1 className="text-2xl font-bold tracking-tight text-gray-900">Is my personal information safe?</h1>
           <p className="mt-6 text-lg leading-8 text-gray-600">
-            Ready to find your perfect on-campus home? <a href="/signup">Sign up today</a> and let us help you take the hassle out of housing.
+            We take your privacy seriously. All personal data is encrypted, and we do not share your information with third parties without your consent.
+          </p>
+        </section>
+        <br></br> */}
+
+        <section>
+          <h1 className="text-2xl font-bold tracking-tight text-gray-900">How do I unsubscribe from the newsletter?</h1>
+          <p className="mt-6 text-lg leading-8 text-gray-600">
+            If you no longer wish to receive housing updates, you can unsubscribe at any time by clicking the "Unsubscribe" link at the bottom of any newsletter or by managing your preferences in your account settings.
+          </p>
+        </section>
+        <br></br>
+
+        {/* <section>
+          <h1 className="text-2xl font-bold tracking-tight text-gray-900">Who can I contact for support?</h1>
+          <p className="mt-6 text-lg leading-8 text-gray-600">
+            If you have any questions or encounter any issues, feel free to reach out to our support team via email at <a href="mailto:support@yourwebapp.com">support@yourwebapp.com</a> or use the contact form on our website.
+          </p>
+        </section>
+        <br></br> */}
+
+        {/* <section>
+          <h1 className="text-2xl font-bold tracking-tight text-gray-900">11. Is there a cost to use the app?</h1>
+          <p className="mt-6 text-lg leading-8 text-gray-600">
+            Our basic service is free to use. We do offer premium features for a small fee, including early access to new listings and advanced filtering options.
+          </p>
+        </section>
+        <br></br> */}
+
+        <section>
+          <h1 className="text-2xl font-bold tracking-tight text-gray-900">Can I suggest a feature or report a bug?</h1>
+          <p className="mt-6 text-lg leading-8 text-gray-600">
+            Absolutely! We’re always looking to improve. You can suggest features or report bugs directly through the app or by contacting our support team.
           </p>
         </section>
 
