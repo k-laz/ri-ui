@@ -1,6 +1,30 @@
 // src/api.ts
 import { API_URL } from './constants';
 import { UserFilter, RawUserData } from './types';
+import { User } from 'firebase/auth';
+
+export const syncUserWithBackend = async (user: User): Promise<void> => {
+  try {
+    const response = await fetch(`${API_URL}/users/sync`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${await user.getIdToken()}`,
+      },
+      body: JSON.stringify({
+        firebaseUId: user.uid,
+        email: user.email,
+      }),
+    });
+    if (!response.ok) {
+      throw new Error('Failed to sync user with backend.');
+    }
+    console.log('User successfully synced with backend.');
+  } catch (error) {
+    console.error('Error syncing user with backend:', error);
+    throw error;
+  }
+};
 
 export const fetchUserData = async (token: string): Promise<RawUserData> => {
   try {
@@ -27,7 +51,7 @@ export const createUserProfile = async (firebaseUId: string, email: string) => {
     headers: {
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({ firebaseUId, email, isActive: false }),
+    body: JSON.stringify({ firebaseUId, email }),
   });
   if (!response.ok) {
     throw new Error('Failed to create user profile');
