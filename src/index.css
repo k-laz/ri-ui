@@ -1,3 +1,19 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+input[type='range']::-webkit-slider-runnable-track {
+    background-color: #ffffff;
+    border-radius: 12px;
+    border: 1px solid #d1d5db;
+}
+
+input[type='range']::-webkit-slider-thumb {
+    appearance: none;
+    background-color: #0b7a75;
+    /* Tailwind 'gray-800' */
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    cursor: pointer;
+}
