@@ -100,7 +100,14 @@ const Filter = () => {
                           min="0"
                           max="5000"
                           step="10"
-                          className="w-2/3 sm:w-full appearance-none"
+                          className="custom-range-slider w-2/3 sm:w-full appearance-none"
+                          style={{
+                            '--slider-value': `${(values.price_limit / 5000) * 100}%`,
+                          }}
+                          value={values.price_limit}
+                          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                            setFieldValue('price_limit', e.target.value ? parseInt(e.target.value) : '')
+                          }
                         />
                         <Field
                           id="price_limit_input"
@@ -420,8 +427,8 @@ const Filter = () => {
                         setFieldValue('furnished', !values.furnished)
                       }
                       className={`mt-2 flex items-center rounded-full px-4 py-2 ${values.furnished
-                          ? 'bg-primary text-white'
-                          : 'bg-gray-200 text-gray-700'
+                        ? 'bg-primary text-white'
+                        : 'bg-gray-200 text-gray-700'
                         }`}
                     >
                       {values.furnished ? (
@@ -441,8 +448,8 @@ const Filter = () => {
                         setFieldValue('pet_friendly', !values.pet_friendly)
                       }
                       className={`flex items-center rounded-full px-4 py-2 md:mt-8 ${values.pet_friendly
-                          ? 'bg-primary text-white'
-                          : 'bg-gray-200 text-gray-700'
+                        ? 'bg-primary text-white'
+                        : 'bg-gray-200 text-gray-700'
                         }`}
                     >
                       {values.pet_friendly ? (
