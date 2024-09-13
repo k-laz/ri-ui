@@ -100,7 +100,14 @@ const Filter = () => {
                           min="0"
                           max="5000"
                           step="10"
-                          className="w-2/3 sm:w-full"
+                          className="custom-range-slider w-2/3 sm:w-full appearance-none"
+                          style={{
+                            '--slider-value': `${(values.price_limit / 5000) * 100}%`,
+                          }}
+                          value={values.price_limit}
+                          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                            setFieldValue('price_limit', e.target.value ? parseInt(e.target.value) : '')
+                          }
                         />
                         <Field
                           id="price_limit_input"
@@ -249,12 +256,11 @@ const Filter = () => {
                           <span
                             className={`
                               inline-flex h-10 w-10 cursor-pointer items-center justify-center rounded-full
-                              ${
-                                values.num_baths?.includes(
-                                  option as 0 | 1 | 2 | 3 | 4,
-                                ) // Type assertion
-                                  ? 'bg-primary text-white'
-                                  : 'bg-gray-200 text-gray-700'
+                              ${values.num_baths?.includes(
+                              option as 0 | 1 | 2 | 3 | 4,
+                            ) // Type assertion
+                                ? 'bg-primary text-white'
+                                : 'bg-gray-200 text-gray-700'
                               }
                             `}
                           >
@@ -309,7 +315,7 @@ const Filter = () => {
                                 setFieldValue(
                                   'num_beds',
                                   values.num_beds?.filter((v) => v !== value) ||
-                                    [],
+                                  [],
                                 );
                               }
                             }}
@@ -317,12 +323,11 @@ const Filter = () => {
                           <span
                             className={`
                               inline-flex h-10 w-10 cursor-pointer items-center justify-center rounded-full
-                              ${
-                                values.num_beds?.includes(
-                                  option as 0 | 1 | 2 | 3 | 4,
-                                ) // Type assertion
-                                  ? 'bg-primary text-white'
-                                  : 'bg-gray-200 text-gray-700'
+                              ${values.num_beds?.includes(
+                              option as 0 | 1 | 2 | 3 | 4,
+                            ) // Type assertion
+                                ? 'bg-primary text-white'
+                                : 'bg-gray-200 text-gray-700'
                               }
                             `}
                           >
@@ -386,12 +391,11 @@ const Filter = () => {
                           <span
                             className={`
                               inline-flex h-10 w-10 cursor-pointer items-center justify-center rounded-full
-                              ${
-                                values.num_parking?.includes(
-                                  option as 0 | 1 | 2 | 3 | 4,
-                                ) // Type assertion
-                                  ? 'bg-primary text-white'
-                                  : 'bg-gray-200 text-gray-700'
+                              ${values.num_parking?.includes(
+                              option as 0 | 1 | 2 | 3 | 4,
+                            ) // Type assertion
+                                ? 'bg-primary text-white'
+                                : 'bg-gray-200 text-gray-700'
                               }
                             `}
                           >
@@ -422,11 +426,10 @@ const Filter = () => {
                       onChange={() =>
                         setFieldValue('furnished', !values.furnished)
                       }
-                      className={`mt-2 flex items-center rounded-full px-4 py-2 ${
-                        values.furnished
-                          ? 'bg-primary text-white'
-                          : 'bg-gray-200 text-gray-700'
-                      }`}
+                      className={`mt-2 flex items-center rounded-full px-4 py-2 ${values.furnished
+                        ? 'bg-primary text-white'
+                        : 'bg-gray-200 text-gray-700'
+                        }`}
                     >
                       {values.furnished ? (
                         <CheckIcon className="h-5 w-5" />
@@ -444,11 +447,10 @@ const Filter = () => {
                       onChange={() =>
                         setFieldValue('pet_friendly', !values.pet_friendly)
                       }
-                      className={`flex items-center rounded-full px-4 py-2 md:mt-8 ${
-                        values.pet_friendly
-                          ? 'bg-primary text-white'
-                          : 'bg-gray-200 text-gray-700'
-                      }`}
+                      className={`flex items-center rounded-full px-4 py-2 md:mt-8 ${values.pet_friendly
+                        ? 'bg-primary text-white'
+                        : 'bg-gray-200 text-gray-700'
+                        }`}
                     >
                       {values.pet_friendly ? (
                         <CheckIcon className="h-5 w-5" />
