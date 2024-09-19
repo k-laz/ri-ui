@@ -100,7 +100,19 @@ const Filter = () => {
                           min="0"
                           max="5000"
                           step="10"
-                          className="w-2/3 appearance-none sm:w-full"
+                          className="custom-range-slider w-2/3 appearance-none sm:w-full"
+                          style={{
+                            '--slider-value': `${
+                              (values.price_limit / 5000) * 100
+                            }%`,
+                          }}
+                          value={values.price_limit}
+                          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                            setFieldValue(
+                              'price_limit',
+                              e.target.value ? parseInt(e.target.value) : '',
+                            )
+                          }
                         />
                         <Field
                           id="price_limit_input"
