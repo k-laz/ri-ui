@@ -109,22 +109,26 @@ const Filter = () => {
                             setFieldValue('price_limit', e.target.value ? parseInt(e.target.value) : '')
                           }
                         />
-                        <Field
-                          id="price_limit_input"
-                          name="price_limit"
-                          type="number"
-                          min="0"
-                          max="5000"
-                          step="10"
-                          className="ml-4 min-w-20 truncate rounded-md border-2 border-primary p-1 text-center lg:pl-4"
-                          value={values.price_limit}
-                          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                            setFieldValue(
-                              'price_limit',
-                              e.target.value ? parseInt(e.target.value) : '',
-                            )
-                          }
-                        />
+                        {/* Number Input Field with + sign */}
+                        <div className="relative">
+                          <Field
+                            id="price_limit_input"
+                            name="price_limit"
+                            type="number"
+                            min="0"
+                            max="5000"
+                            step="10"
+                            className="ml-4 min-w-20 truncate rounded-md border-2 border-primary p-1 text-center lg:pl-4" /* Added padding-right to create space for + sign */
+                            value={values.price_limit}
+                            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                              setFieldValue('price_limit', e.target.value ? parseInt(e.target.value) : '')
+                            }
+                          />
+                          {/* Conditionally display + sign inside the input field */}
+                          {values.price_limit >= 5000 && (
+                            <span className="absolute inset-y-0 right-2 pr-4 flex items-center">+</span>
+                          )}
+                        </div>
                       </div>
                       <ErrorMessage
                         name="price_limit"
