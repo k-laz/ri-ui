@@ -27,7 +27,7 @@ export const createUserProfile = async (firebaseUId: string, email: string) => {
     headers: {
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({ firebaseUId, email, isActive: false }),
+    body: JSON.stringify({ firebaseUId, email }),
   });
   if (!response.ok) {
     throw new Error('Failed to create user profile');
