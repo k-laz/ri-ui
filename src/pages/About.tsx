@@ -1,6 +1,6 @@
 export default function About() {
   return (
-    <div className="bg-gray-50 py-24 sm:py-12">
+    <div className="py-24 sm:py-12">
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
         {/* Main Title */}
         <h1 className="text-5xl font-extrabold tracking-tight text-center" style={{ color: '#0b7a75' }}>
