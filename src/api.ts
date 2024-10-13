@@ -2,6 +2,30 @@
 import { API_URL } from './constants';
 import { UserFilter, RawUserData } from './types';
 
+export const syncUserProfile = async (
+  token: string,
+  firebaseUId: string,
+  email: string,
+) => {
+  try {
+    const response = await fetch(`${API_URL}/users/sync`, {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ firebaseUId, email }),
+    });
+    if (!response.ok) {
+      throw new Error('Network response was not ok');
+    }
+    return response.json();
+  } catch (error) {
+    console.error('Error syncing user data:', error);
+    throw error;
+  }
+};
+
 export const fetchUserData = async (token: string): Promise<RawUserData> => {
   try {
     const response = await fetch(`${API_URL}/users/me`, {

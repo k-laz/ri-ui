@@ -11,7 +11,12 @@ import {
 } from 'firebase/auth';
 import { auth } from '../firebase.config';
 import { useNavigate } from 'react-router-dom';
-import { createUserProfile, updateUserFilter, fetchUserData } from '../api';
+import {
+  createUserProfile,
+  updateUserFilter,
+  fetchUserData,
+  syncUserProfile,
+} from '../api';
 import { RawUserData, UserData, UserFilter } from '../types';
 
 interface AuthContextType {
@@ -80,7 +85,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const login = async (email: string, password: string): Promise<void> => {
     try {
-      await signInWithEmailAndPassword(auth, email, password);
+      const user_credentials = await signInWithEmailAndPassword(
+        auth,
+        email,
+        password,
+      );
+      // TODO: is this really necessary?
+      await syncUserProfile(
+        await user_credentials.user.getIdToken(),
+        email,
+        user_credentials.user.uid,
+      );
       navigate('/dashboard');
     } catch (error: unknown) {
       if (error instanceof Error) {
