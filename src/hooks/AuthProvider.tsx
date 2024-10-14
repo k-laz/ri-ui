@@ -15,7 +15,7 @@ import {
   createUserProfile,
   updateUserFilter,
   fetchUserData,
-  syncUserWithBackend,
+  syncUserProfile,
 } from '../api';
 import { RawUserData, UserData, UserFilter } from '../types';
 
@@ -85,13 +85,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const login = async (email: string, password: string): Promise<void> => {
     try {
-      const userCredential = await signInWithEmailAndPassword(
+      const user_credentials = await signInWithEmailAndPassword(
         auth,
         email,
         password,
       );
-      const user = userCredential.user;
-      await syncUserWithBackend(user);
+      // TODO: is this really necessary?
+      await syncUserProfile(
+        await user_credentials.user.getIdToken(),
+        email,
+        user_credentials.user.uid,
+      );
       navigate('/dashboard');
     } catch (error: unknown) {
       if (error instanceof Error) {

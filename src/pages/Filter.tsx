@@ -100,24 +100,40 @@ const Filter = () => {
                           min="0"
                           max="5000"
                           step="10"
-                          className="w-2/3 sm:w-full"
-                        />
-                        <Field
-                          id="price_limit_input"
-                          name="price_limit"
-                          type="number"
-                          min="0"
-                          max="5000"
-                          step="10"
-                          className="ml-4 min-w-20 truncate rounded-md border-2 border-primary p-1 text-center lg:pl-4"
-                          value={values.price_limit}
+                          className="custom-range-slider w-2/3 appearance-none sm:w-full"
+                          style={{
+                            '--slider-value': `${
+                              ((values.price_limit ?? 0) / 5000) * 100
+                            }%`,
+                          }}
+                          value={values.price_limit ?? 0}
                           onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                             setFieldValue(
                               'price_limit',
-                              e.target.value ? parseInt(e.target.value) : '',
+                              e.target.value ? parseInt(e.target.value) : 0,
                             )
                           }
                         />
+                        {/* Disabled Number Input Field */}
+                        <div className="relative">
+                          <Field
+                            id="price_limit_input"
+                            name="price_limit"
+                            type="number"
+                            min="0"
+                            max="5000"
+                            step="10"
+                            className="ml-4 min-w-20 truncate rounded-md border-2 border-primary p-1 text-center lg:pl-4"
+                            value={values.price_limit ?? 0}
+                            disabled
+                          />
+                          {/* Conditionally display + sign inside the input field */}
+                          {(values.price_limit ?? 0) >= 5000 && (
+                            <span className="absolute inset-y-0 right-12 flex items-center pr-4">
+                              +
+                            </span>
+                          )}
+                        </div>
                       </div>
                       <ErrorMessage
                         name="price_limit"

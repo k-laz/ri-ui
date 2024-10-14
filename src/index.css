@@ -1,3 +1,67 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Custom styles for the range input */
+/* Custom styles for the range input */
+.custom-range-slider {
+    -webkit-appearance: none;
+    /* Remove default styles for Webkit browsers */
+    /* Make the background transparent to show the custom fill */
+    border-radius: 12px;
+    border: 1px solid #d1d5db;
+    /* Rounded border for the slider track */
+    cursor: pointer;
+    position: relative;
+    /* Positioning context for the pseudo-element */
+}
+
+/* Slider track fill using a pseudo-element */
+.custom-range-slider::-webkit-slider-runnable-track {
+    background: #fff;
+    /* Background color of the track */
+    height: 8px;
+    border-radius: 10px;
+    /* Rounded corners for the track */
+}
+
+/* Slider thumb (the draggable part) */
+.custom-range-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    /* Remove default styling */
+    appearance: none;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    /* Rounded thumb */
+    background: #0b7a75;
+    /* Thumb color */
+    position: relative;
+    /* Ensure thumb is positioned relative to its container */
+    top: -4px;
+    /* Move thumb up */
+
+}
+
+/* Fill effect for the slider track */
+.custom-range-slider:before {
+    content: '';
+    position: absolute;
+    height: 100%;
+    border-radius: 10px;
+    background: #0b7a75;
+    /* Fill color */
+    z-index: 0;
+    transition: width 0.15s ease-in-out;
+}
+
+/* Update the fill effect based on the thumb position */
+.custom-range-slider::-webkit-slider-runnable-track {
+    background: linear-gradient(to right, #0b7a75 var(--slider-value), #fff var(--slider-value));
+}
+
+/* Hover state for the thumb */
+.custom-range-slider::-webkit-slider-thumb:hover {
+    background: #0a6d63;
+    /* Slightly darker hover color */
+}
