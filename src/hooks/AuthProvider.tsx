@@ -8,6 +8,7 @@ import {
   signInWithPopup,
   User,
   AuthError,
+  sendPasswordResetEmail as firebaseSendPasswordResetEmail,
 } from 'firebase/auth';
 import { auth } from '../firebase.config';
 import { useNavigate } from 'react-router-dom';
@@ -27,6 +28,7 @@ interface AuthContextType {
   signup: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
   updateProfile: (userId: string, filter: UserFilter) => Promise<void>;
+  sendPasswordResetEmail: (email: string) => Promise<void>;
   refreshUser: unknown;
   notificationModalOpen: unknown;
   setNotificationModalOpen: unknown;
@@ -102,6 +104,25 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         const firebaseError = error as AuthError;
         const errorMessage = getErrorMessage(firebaseError.code);
         console.error('Failed to login:', errorMessage);
+        throw new Error(errorMessage);
+      } else {
+        console.error('Unexpected error:', error);
+        throw new Error(
+          'An unexpected error occurred. Please try again later.',
+        );
+      }
+    }
+  };
+
+  const sendPasswordResetEmail = async (email: string): Promise<void> => {
+    try {
+      await firebaseSendPasswordResetEmail(auth, email);
+      console.log('Password reset email sent');
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        const firebaseError = error as AuthError;
+        const errorMessage = getErrorMessage(firebaseError.code);
+        console.error('Failed to send password reset email:', errorMessage);
         throw new Error(errorMessage);
       } else {
         console.error('Unexpected error:', error);
@@ -250,6 +271,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     notificationModalOpen,
     setNotificationModalOpen,
     firstTimeSignUp,
+    sendPasswordResetEmail,
 
     notificationTitle,
     setNotificationTitle,

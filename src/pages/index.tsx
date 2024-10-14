@@ -6,3 +6,4 @@ export { default as Blog } from './Blog';
 export { default as About } from './About';
 export { default as Filter } from './Filter';
 export { default as Faq } from './Faq';
+export { default as ForgotPassword } from './ForgotPassword';
