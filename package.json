@@ -7,6 +7,8 @@
     "start": "node server/index.js",
     "start:dev": "nodemon server/index.js",
     "dev": "bash injectenv.sh && vite --host",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d build",
     "prebuild": "bash prebuild.sh",
     "build": "tsc && vite build",
     "test": "craco test",
