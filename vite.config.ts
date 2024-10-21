@@ -7,7 +7,8 @@ import path from 'path';
  * @see https://vitejs.dev/config/
  */
 export default defineConfig({
-  base: './',
+  // base: process.env.NODE_ENV === 'prod' ? '/ri-ui/' : '/',
+  base: '/ri-ui/',
   build: {
     manifest: true,
 

@@ -1,4 +1,5 @@
 #!/bin/bash
-source env.sh
+source environment/env.sh
+export NODE_ENV="prod"
 npm run build
 npm run start

@@ -5,7 +5,8 @@
   "type": "module",
   "homepage": "https://k-laz.github.io/ri-ui",
   "scripts": {
-    "start": "node server/index.js",
+    "start": "vite",
+    "prod": "bash runProd.sh",
     "start:dev": "nodemon server/index.js",
     "dev": "bash injectenv.sh && vite --host",
     "predeploy": "npm run build",
