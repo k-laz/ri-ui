@@ -7,6 +7,7 @@ import path from 'path';
  * @see https://vitejs.dev/config/
  */
 export default defineConfig({
+  base: '/ri-ui/',
   plugins: [react(), eslintPlugin()],
   resolve: {
     alias: {

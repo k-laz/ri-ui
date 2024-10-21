@@ -33,7 +33,7 @@ export const syncUserProfile = async (
 ) => {
   try {
     const response = await fetch(`${API_URL}/users/sync`, {
-      method: 'GET',
+      method: 'POST',
       headers: {
         Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json',
