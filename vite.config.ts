@@ -8,6 +8,15 @@ import path from 'path';
  */
 export default defineConfig({
   base: '/ri-ui/',
+  build: {
+    rollupOptions: {
+      output: {
+        entryFileNames: 'assets/[name].js',
+        chunkFileNames: 'assets/[name].js',
+        assetFileNames: 'assets/[name].[ext]',
+      },
+    },
+  },
   plugins: [react(), eslintPlugin()],
   resolve: {
     alias: {
