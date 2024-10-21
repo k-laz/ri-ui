@@ -9,6 +9,8 @@ import path from 'path';
 export default defineConfig({
   base: '/ri-ui/',
   build: {
+    manifest: true,
+
     rollupOptions: {
       output: {
         entryFileNames: 'assets/[name].js',
