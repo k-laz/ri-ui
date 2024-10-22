@@ -83,10 +83,14 @@ export const createUserProfile = async (firebaseUId: string, email: string) => {
   return response.json();
 };
 
-export const updateUserFilter = async (userId: string, filter: UserFilter) => {
-  const response = await fetch(`${API_URL}/users/${userId}/filter`, {
+export const updateUserFilter = async (
+  token: string,
+  filter: Partial<UserFilter>,
+) => {
+  const response = await fetch(`${API_URL}/users/me/filter`, {
     method: 'POST',
     headers: {
+      Authorization: `Bearer ${token}`,
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({ filter }),

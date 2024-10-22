@@ -27,7 +27,7 @@ interface AuthContextType {
   loginWithGoogle: () => Promise<void>;
   signup: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
-  updateProfile: (userId: string, filter: UserFilter) => Promise<void>;
+  updateFilter: (filter: Partial<UserFilter>) => Promise<void>;
   sendPasswordResetEmail: (email: string) => Promise<void>;
   refreshUser: unknown;
   notificationModalOpen: unknown;
@@ -179,13 +179,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   };
 
-  const updateProfile = async (
-    userId: string,
-    filter: UserFilter,
-  ): Promise<void> => {
+  const updateFilter = async (filter: Partial<UserFilter>): Promise<void> => {
     try {
-      await updateUserFilter(userId, filter);
-    } catch (error: unknown) {
+      if (currentUser) {
+        // Fetch token asynchronously
+        const token = await currentUser.getIdToken();
+        // Call updateUserFilter with the fetched token
+        const response = await updateUserFilter(token, filter);
+        // Optional: Check if the response is successful (based on your API)
+        if (!response || response.error) {
+          throw new Error('Failed to update profile: Invalid response');
+        }
+        return response;
+      } else {
+        throw new Error('User is not logged in');
+      }
+    } catch (error) {
       if (error instanceof Error) {
         console.error('Failed to update profile:', error.message);
         throw new Error('Failed to update profile');
@@ -266,7 +275,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     login,
     signup,
     logout,
-    updateProfile,
+    updateFilter,
     refreshUser: () => setRefreshUser(Math.random()),
     notificationModalOpen,
     setNotificationModalOpen,

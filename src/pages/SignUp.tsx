@@ -22,7 +22,9 @@ export default function SignUp() {
       if (err instanceof Error) {
         setError(err.message); // Display the user-friendly error message
       } else {
-        setError('An unexpected error occurred. Please try again later.');
+        setError(
+          'An unexpected error occurred during signup. Please try again later.',
+        );
       }
     }
   };

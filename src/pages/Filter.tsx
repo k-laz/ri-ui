@@ -4,7 +4,6 @@ import { Switch } from '@headlessui/react';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import { CheckIcon, XMarkIcon } from '@heroicons/react/24/solid';
-import { API_URL } from '@/constants';
 
 const validationSchema = Yup.object({
   price_limit: Yup.number(),
@@ -47,19 +46,7 @@ const Filter = () => {
 
   const handleSubmit = async (values: Partial<UserFilter>) => {
     try {
-      console.log(values);
-      const response = await fetch(`${API_URL}/users/me/filter`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(values),
-      });
-
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
-      }
-
+      await auth.updateFilter(values);
       alert('Filter updated successfully!');
       console.log('Filter updated successfully!', values);
     } catch (error) {
