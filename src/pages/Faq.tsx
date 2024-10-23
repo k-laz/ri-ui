@@ -89,6 +89,7 @@ export default function FAQ() {
           {openSection === 6 && (
             <p className="mt-6 text-lg leading-8 text-gray-600">
               Our app scrapes data from various official campus housing websites and databases to bring you the most up-to-date and comprehensive listings available.
+              For more information on how we handle your data, please review our <a href="https://www.freeprivacypolicy.com/live/d2aaabff-b0c7-4155-ba80-64b53e3592b7" className="text-blue-600 underline" target="_blank" rel="noopener noreferrer">Privacy Policy</a>.
             </p>
           )}
         </section>
