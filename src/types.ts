@@ -6,7 +6,7 @@ export type RawUserData = {
   createdAt: string;
   firebaseUId: string;
   email: string;
-  UserFilter: UserFilter;
+  filter: UserFilter;
   Listings: Listing[];
 };
 

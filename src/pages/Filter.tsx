@@ -4,6 +4,7 @@ import { Switch } from '@headlessui/react';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import { CheckIcon, XMarkIcon } from '@heroicons/react/24/solid';
+import { useEffect, useState } from 'react';
 
 const validationSchema = Yup.object({
   price_limit: Yup.number(),
@@ -29,9 +30,38 @@ const validationSchema = Yup.object({
 const Filter = () => {
   const auth = useAuth();
 
-  if (!auth) {
-    alert('User not logged in!');
+  const [isLoading, setIsLoading] = useState(true); // Start with loading true
+
+  // Add effect to handle initial data fetch
+  useEffect(() => {
+    const loadUserData = async () => {
+      if (auth?.firebaseCurrentUser) {
+        try {
+          // await auth.refreshUserData(); // Your refresh function from auth context
+          await auth.getUserFilter();
+        } catch (error) {
+          console.error('Error loading user data:', error);
+        } finally {
+          setIsLoading(false);
+        }
+      }
+    };
+
+    loadUserData();
+  }, []);
+
+  // Show loading state while either auth is loading or initial data fetch is happening
+  if (isLoading || !auth?.userData) {
+    return (
+      <div className="flex h-2/3 items-center justify-center">
+        <div className="text-center">
+          <div className="mx-auto h-12 w-12 animate-spin rounded-full border-b-2 border-t-2 border-primary"></div>
+          <p className="mt-4 text-gray-600">Loading your filter settings...</p>
+        </div>
+      </div>
+    );
   }
+
   const initialValues: Partial<UserFilter> = {
     price_limit: auth.userData?.filter?.price_limit ?? 0,
     move_in_date: auth.userData?.filter?.move_in_date ?? '',
@@ -43,6 +73,8 @@ const Filter = () => {
     pet_friendly: auth.userData?.filter?.pet_friendly ?? false,
     gender_preference: auth.userData?.filter?.gender_preference ?? '',
   };
+
+  console.log(initialValues);
 
   const handleSubmit = async (values: Partial<UserFilter>) => {
     try {

@@ -1,5 +1,11 @@
 // src/AuthProvider.tsx
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useState,
+} from 'react';
 import {
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
@@ -29,12 +35,13 @@ interface AuthContextType {
   logout: () => Promise<void>;
   updateFilter: (filter: Partial<UserFilter>) => Promise<void>;
   sendPasswordResetEmail: (email: string) => Promise<void>;
-  refreshUser: unknown;
   notificationModalOpen: unknown;
   setNotificationModalOpen: unknown;
   notificationTitle: unknown;
   setNotificationTitle: unknown;
   firstTimeSignUp: boolean;
+  // refreshUserData: () => Promise<void>;
+  getUserFilter: () => Promise<void>;
 }
 
 const initialUserData = {};
@@ -75,7 +82,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 }) => {
   const navigate = useNavigate();
   const [currentUser, setCurrentUser] = useState<User | null>(auth.currentUser);
-  const [refreshUser, setRefreshUser] = useState(Math.random());
   const [firstTimeSignUp, setFirstTimeSignUp] = useState(false);
   const [userData, setUserData] = useState(() => {
     const data = sessionStorage.getItem('userData');
@@ -163,7 +169,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       const firebaseUId = userCredential.user.uid;
       await createUserProfile(firebaseUId, email);
       setFirstTimeSignUp(true);
-      navigate('/filter/setup');
+      navigate('/dashboard');
     } catch (error: unknown) {
       if (error instanceof Error) {
         const firebaseError = error as AuthError;
@@ -179,25 +185,50 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   };
 
-  const updateFilter = async (filter: Partial<UserFilter>): Promise<void> => {
+  // const updateFilter = async (filter: Partial<UserFilter>): Promise<void> => {
+  //   try {
+  //     if (currentUser) {
+  //       // Fetch token asynchronously
+  //       const token = await currentUser.getIdToken();
+  //       // Call updateUserFilter with the fetched token
+  //       const response = await updateUserFilter(token, filter);
+  //       // Optional: Check if the response is successful (based on your API)
+  //       if (!response || response.error) {
+  //         throw new Error('Failed to update profile: Invalid response');
+  //       }
+  //       // Refresh user data after successful update
+  //       await refreshUserData();
+
+  //       return response;
+  //     } else {
+  //       throw new Error('User is not logged in');
+  //     }
+  //   } catch (error) {
+  //     if (error instanceof Error) {
+  //       console.error('Failed to update profile:', error.message);
+  //       throw new Error('Failed to update profile');
+  //     } else {
+  //       console.error('Unexpected error:', error);
+  //       throw new Error(
+  //         'An unexpected error occurred. Please try again later.',
+  //       );
+  //     }
+  //   }
+  // };
+
+  const getUserFilter = async (): Promise<void> => {
     try {
       if (currentUser) {
-        // Fetch token asynchronously
         const token = await currentUser.getIdToken();
-        // Call updateUserFilter with the fetched token
-        const response = await updateUserFilter(token, filter);
-        // Optional: Check if the response is successful (based on your API)
-        if (!response || response.error) {
-          throw new Error('Failed to update profile: Invalid response');
-        }
-        return response;
-      } else {
-        throw new Error('User is not logged in');
+        await fetchUserDataAndUpdate(token);
+        // await fetchUserFilter(token).then((data: UserFilter) => {
+        //   setUserData({ filter: data });
+        // });
       }
     } catch (error) {
       if (error instanceof Error) {
-        console.error('Failed to update profile:', error.message);
-        throw new Error('Failed to update profile');
+        console.error('Failed to get user filter:', error.message);
+        throw new Error('Failed to get user filter');
       } else {
         console.error('Unexpected error:', error);
         throw new Error(
@@ -227,6 +258,45 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   };
 
+  const fetchUserDataAndUpdate = useCallback(async (token: string) => {
+    try {
+      const data: RawUserData = await fetchUserData(token);
+      const newUserData = {
+        filter: data.filter,
+        email: data.email,
+        id: data.id,
+      };
+      setUserData(newUserData);
+
+      // if (firstTimeSignUp) {
+      //   setNotificationModalOpen(true);
+      //   setNotificationTitle('Sign up successful!');
+      // }
+    } catch (error) {
+      console.error('Failed to fetch user data:', error);
+    }
+  }, []);
+
+  // Memoized update filter function
+  const updateFilter = useCallback(
+    async (filter: Partial<UserFilter>) => {
+      if (!currentUser) throw new Error('User is not logged in');
+
+      const token = await currentUser.getIdToken();
+      const response = await updateUserFilter(token, filter);
+
+      if (!response || response.error) {
+        throw new Error('Failed to update profile: Invalid response');
+      }
+
+      // Instead of calling refreshUserData, fetch and update directly
+      await fetchUserDataAndUpdate(token);
+
+      return response;
+    },
+    [currentUser, fetchUserDataAndUpdate],
+  );
+
   useEffect(() => {
     const authObserver = auth.onAuthStateChanged((user) => {
       setCurrentUser(user);
@@ -235,38 +305,34 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     return authObserver;
   }, []);
 
+  // Handle user data fetching
   useEffect(() => {
-    const userDataCache = JSON.parse(
-      sessionStorage.getItem('userData') || '{}',
-    );
+    let isMounted = true;
 
-    if (currentUser && !(userDataCache?.isReady ?? false)) {
-      currentUser.getIdToken().then(async (token) => {
-        await fetchUserData(token)
-          .then((data: RawUserData) => {
-            setUserData({
-              isReady: true,
-              filter: data.UserFilter,
-              listings: data.Listings,
-              email: data.email,
-              id: data.id,
-            });
+    const loadUserData = async () => {
+      if (!currentUser) return;
 
-            if (firstTimeSignUp) {
-              setNotificationModalOpen(true);
-              setNotificationTitle('Sign up successful!');
-            }
-          })
-          .catch((error) => {
-            console.error('Failed to fetch user data:', error);
-          });
-      });
-    }
-  }, [currentUser, firstTimeSignUp, refreshUser]);
+      try {
+        const token = await currentUser.getIdToken();
+        if (isMounted) {
+          await fetchUserDataAndUpdate(token);
+        }
+      } catch (error) {
+        console.error('Error loading user data:', error);
+      }
+    };
 
-  useEffect(() => {
-    sessionStorage.setItem('userData', JSON.stringify(userData));
-  }, [userData]);
+    loadUserData();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [currentUser, fetchUserDataAndUpdate]);
+
+  // Function to refresh user data
+  // const refreshUserData = useCallback(async () => {
+  //   setRefreshTrigger((prev) => prev + 1);
+  // }, []);
 
   const value: AuthContextType = {
     userData,
@@ -276,11 +342,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     signup,
     logout,
     updateFilter,
-    refreshUser: () => setRefreshUser(Math.random()),
+    // refreshUserData,
     notificationModalOpen,
     setNotificationModalOpen,
     firstTimeSignUp,
     sendPasswordResetEmail,
+    getUserFilter,
 
     notificationTitle,
     setNotificationTitle,
