@@ -1,3 +1,4 @@
+import TermsModal from '@/components/TermsModal';
 import { useAuth } from '@/hooks/AuthProvider';
 import { useState } from 'react';
 
@@ -6,6 +7,7 @@ export default function SignUp() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
+  const [acceptedTerms, setAcceptedTerms] = useState(false);
 
   if (!auth) {
     throw new Error('useAuth must be used within an AuthProvider');
@@ -16,11 +18,16 @@ export default function SignUp() {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError(null);
+    if (!acceptedTerms) {
+      setError('Please accept the Terms and Conditions to continue');
+      return;
+    }
+
     try {
       await signup(email, password);
     } catch (err: unknown) {
       if (err instanceof Error) {
-        setError(err.message); // Display the user-friendly error message
+        setError(err.message);
       } else {
         setError(
           'An unexpected error occurred during signup. Please try again later.',
@@ -52,7 +59,7 @@ export default function SignUp() {
                 name="email"
                 id="email"
                 className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-primary focus:ring-primary "
-                placeholder="name@company.com"
+                placeholder="myname@example.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
               />
@@ -80,18 +87,14 @@ export default function SignUp() {
                   id="terms"
                   aria-describedby="terms"
                   type="checkbox"
+                  checked={acceptedTerms}
+                  onChange={(e) => setAcceptedTerms(e.target.checked)}
                   className="h-4 w-4 rounded text-primary focus:ring-transparent"
                 />
               </div>
               <div className="ml-3 text-sm">
                 <label htmlFor="terms" className="font-light text-gray-500 ">
-                  I accept the{' '}
-                  <a
-                    className="font-medium text-primary hover:underline"
-                    href="#"
-                  >
-                    Terms and Conditions
-                  </a>
+                  I accept the <TermsModal />
                 </label>
               </div>
             </div>

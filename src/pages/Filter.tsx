@@ -99,7 +99,7 @@ const Filter = () => {
             Your Filter
           </h2>
           <Form className="mx-auto w-full max-w-5xl rounded-lg md:p-10">
-            <div className="overflow-y-scroll border-b border-gray-900/10 p-3 lg:mx-10">
+            <div className="border-b border-gray-900/10 p-3 lg:mx-10">
               <div className="relative mt-10 grid grid-cols-1 gap-x-6 gap-y-4 sm:grid-cols-10 sm:gap-y-8 md:gap-x-16 lg:mb-4">
                 <>
                   {/* Budget Price Cap Slider */}
@@ -204,6 +204,7 @@ const Filter = () => {
                         <option value={4}>4 months</option>
                         <option value={8}>8 months</option>
                         <option value={12}>12 months</option>
+                        <option value="any">Any</option>
                       </Field>
                     </div>
                   </div>
