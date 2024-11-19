@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { useAuth } from '../hooks/AuthProvider'; // Update with the correct path
 
+import PasswordInput from '@/components/PasswordInput';
+
 export default function LogIn() {
   const auth = useAuth();
   const [email, setEmail] = useState('');
@@ -56,34 +58,7 @@ export default function LogIn() {
                 required
               />
             </div>
-            <div>
-              <div className="flex flex-row justify-between">
-                <label
-                  htmlFor="password"
-                  className="mb-2 block text-sm font-medium text-gray-900"
-                >
-                  Password
-                </label>
-                <div className="text-sm">
-                  <a
-                    href="/forgot-password"
-                    className="font-semibold text-primary hover:text-secondary"
-                  >
-                    Forgot password?
-                  </a>
-                </div>
-              </div>
-              <input
-                type="password"
-                name="password"
-                id="password"
-                placeholder="••••••••"
-                className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-primary focus:ring-primary"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-              />
-            </div>
+            <PasswordInput setPassword={setPassword} password={password} />
             <button
               type="submit"
               className="w-full rounded-lg bg-primary px-5 py-2.5 text-center text-sm font-medium text-white hover:bg-secondary focus:outline-none focus:ring-4 focus:ring-transparent"
