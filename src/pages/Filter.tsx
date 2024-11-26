@@ -48,7 +48,7 @@ const Filter = () => {
     };
 
     loadUserData();
-  }, []);
+  });
 
   // Show loading state while either auth is loading or initial data fetch is happening
   if (isLoading || !auth?.userData) {
@@ -73,8 +73,6 @@ const Filter = () => {
     pet_friendly: auth.userData?.filter?.pet_friendly ?? false,
     gender_preference: auth.userData?.filter?.gender_preference ?? '',
   };
-
-  console.log(initialValues);
 
   const handleSubmit = async (values: Partial<UserFilter>) => {
     try {

@@ -16,6 +16,7 @@ const Navbar = () => {
   const { firebaseCurrentUser, logout } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
+  // print user token for dev
   firebaseCurrentUser?.getIdToken().then((data) => console.log(data));
 
   return (

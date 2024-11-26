@@ -52,7 +52,7 @@ export default function LogIn() {
                 name="email"
                 id="email"
                 className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-primary focus:ring-primary"
-                placeholder="name@company.com"
+                placeholder="your email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
@@ -77,7 +77,7 @@ export default function LogIn() {
           </form>
           <div className="mt-4 text-center">
             <div>Or continue with</div>
-            <div className="flex justify-center space-x-4">
+            <div className="mt-2 flex justify-center space-x-5">
               <button
                 onClick={async () => {
                   try {

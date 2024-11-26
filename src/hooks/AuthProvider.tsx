@@ -140,9 +140,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   };
 
   const loginWithGoogle = async (): Promise<void> => {
-    const provider = new GoogleAuthProvider();
     try {
+      // Sign in using a popup.
+      const provider = new GoogleAuthProvider();
       await signInWithPopup(auth, provider);
+
+      // The signed-in user info.
+      // const user = result.user;
+      // // This gives you a Facebook Access Token.
+      // const credential = provider.credentialFromResult(auth, result);
+      // const token = credential.accessToken;
       navigate('/dashboard');
     } catch (error: unknown) {
       if (error instanceof Error) {
