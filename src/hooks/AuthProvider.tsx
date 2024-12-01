@@ -39,9 +39,6 @@ interface AuthContextType {
   setNotificationModalOpen: unknown;
   notificationTitle: unknown;
   setNotificationTitle: unknown;
-  firstTimeSignUp: boolean;
-  // refreshUserData: () => Promise<void>;
-  getUserFilter: () => Promise<void>;
 }
 
 const initialUserData = {};
@@ -82,7 +79,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 }) => {
   const navigate = useNavigate();
   const [currentUser, setCurrentUser] = useState<User | null>(auth.currentUser);
-  const [firstTimeSignUp, setFirstTimeSignUp] = useState(false);
   const [userData, setUserData] = useState(() => {
     const data = sessionStorage.getItem('userData');
     return data ? JSON.parse(data) : initialUserData;
@@ -90,6 +86,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const [notificationModalOpen, setNotificationModalOpen] = useState(false);
   const [notificationTitle, setNotificationTitle] = useState('');
   const [loading, setLoading] = useState(true);
+
+  const refreshUserData = useCallback(async () => {
+    if (!currentUser) return;
+
+    try {
+      const token = await currentUser.getIdToken();
+      const data: RawUserData = await fetchUserData(token);
+      setUserData(data);
+      sessionStorage.setItem('userData', JSON.stringify(data));
+
+      console.log(sessionStorage.getItem('userData'));
+    } catch (error) {
+      console.error('Error refreshing user data:', error);
+      throw error;
+    }
+  }, [currentUser]);
 
   const login = async (email: string, password: string): Promise<void> => {
     try {
@@ -143,13 +155,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     try {
       // Sign in using a popup.
       const provider = new GoogleAuthProvider();
-      await signInWithPopup(auth, provider);
+      const userCredential = await signInWithPopup(auth, provider);
+      console.log('LoginWithGoogle');
+      console.log(userCredential);
+      await createUserProfile(
+        userCredential.user.uid,
+        userCredential.user.email as string,
+      );
 
-      // The signed-in user info.
-      // const user = result.user;
-      // // This gives you a Facebook Access Token.
-      // const credential = provider.credentialFromResult(auth, result);
-      // const token = credential.accessToken;
       navigate('/dashboard');
     } catch (error: unknown) {
       if (error instanceof Error) {
@@ -175,7 +188,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       );
       const firebaseUId = userCredential.user.uid;
       await createUserProfile(firebaseUId, email);
-      setFirstTimeSignUp(true);
+
       navigate('/dashboard');
     } catch (error: unknown) {
       if (error instanceof Error) {
@@ -183,59 +196,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         const errorMessage = getErrorMessage(firebaseError.code);
         console.error('Failed to sign up:', errorMessage);
         throw new Error(errorMessage);
-      } else {
-        console.error('Unexpected error:', error);
-        throw new Error(
-          'An unexpected error occurred. Please try again later.',
-        );
-      }
-    }
-  };
-
-  // const updateFilter = async (filter: Partial<UserFilter>): Promise<void> => {
-  //   try {
-  //     if (currentUser) {
-  //       // Fetch token asynchronously
-  //       const token = await currentUser.getIdToken();
-  //       // Call updateUserFilter with the fetched token
-  //       const response = await updateUserFilter(token, filter);
-  //       // Optional: Check if the response is successful (based on your API)
-  //       if (!response || response.error) {
-  //         throw new Error('Failed to update profile: Invalid response');
-  //       }
-  //       // Refresh user data after successful update
-  //       await refreshUserData();
-
-  //       return response;
-  //     } else {
-  //       throw new Error('User is not logged in');
-  //     }
-  //   } catch (error) {
-  //     if (error instanceof Error) {
-  //       console.error('Failed to update profile:', error.message);
-  //       throw new Error('Failed to update profile');
-  //     } else {
-  //       console.error('Unexpected error:', error);
-  //       throw new Error(
-  //         'An unexpected error occurred. Please try again later.',
-  //       );
-  //     }
-  //   }
-  // };
-
-  const getUserFilter = async (): Promise<void> => {
-    try {
-      if (currentUser) {
-        const token = await currentUser.getIdToken();
-        await fetchUserDataAndUpdate(token);
-        // await fetchUserFilter(token).then((data: UserFilter) => {
-        //   setUserData({ filter: data });
-        // });
-      }
-    } catch (error) {
-      if (error instanceof Error) {
-        console.error('Failed to get user filter:', error.message);
-        throw new Error('Failed to get user filter');
       } else {
         console.error('Unexpected error:', error);
         throw new Error(
@@ -265,45 +225,21 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   };
 
-  const fetchUserDataAndUpdate = useCallback(async (token: string) => {
-    try {
-      const data: RawUserData = await fetchUserData(token);
-      const newUserData = {
-        filter: data.filter,
-        email: data.email,
-        id: data.id,
-      };
-      setUserData(newUserData);
-
-      // if (firstTimeSignUp) {
-      //   setNotificationModalOpen(true);
-      //   setNotificationTitle('Sign up successful!');
-      // }
-    } catch (error) {
-      console.error('Failed to fetch user data:', error);
-    }
-  }, []);
-
-  // Memoized update filter function
+  // Update Filter
   const updateFilter = useCallback(
     async (filter: Partial<UserFilter>) => {
-      if (!currentUser) throw new Error('User is not logged in');
+      if (!currentUser) throw new Error('User not logged in');
 
       const token = await currentUser.getIdToken();
       const response = await updateUserFilter(token, filter);
-
-      if (!response || response.error) {
-        throw new Error('Failed to update profile: Invalid response');
-      }
-
-      // Instead of calling refreshUserData, fetch and update directly
-      await fetchUserDataAndUpdate(token);
+      await refreshUserData(); // Refresh entire user data after update
 
       return response;
     },
-    [currentUser, fetchUserDataAndUpdate],
+    [currentUser, refreshUserData],
   );
 
+  // Watch for Auth User Change
   useEffect(() => {
     const authObserver = auth.onAuthStateChanged((user) => {
       setCurrentUser(user);
@@ -312,34 +248,27 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     return authObserver;
   }, []);
 
-  // Handle user data fetching
+  // Initial data load on auth state change
   useEffect(() => {
     let isMounted = true;
 
-    const loadUserData = async () => {
-      if (!currentUser) return;
+    const loadInitialData = async () => {
+      if (!currentUser) {
+        sessionStorage.removeItem('userData');
+        setUserData(initialUserData);
+        return;
+      }
 
-      try {
-        const token = await currentUser.getIdToken();
-        if (isMounted) {
-          await fetchUserDataAndUpdate(token);
-        }
-      } catch (error) {
-        console.error('Error loading user data:', error);
+      if (isMounted) {
+        await refreshUserData();
       }
     };
 
-    loadUserData();
-
+    loadInitialData();
     return () => {
       isMounted = false;
     };
-  }, [currentUser, fetchUserDataAndUpdate]);
-
-  // Function to refresh user data
-  // const refreshUserData = useCallback(async () => {
-  //   setRefreshTrigger((prev) => prev + 1);
-  // }, []);
+  }, [currentUser, refreshUserData]);
 
   const value: AuthContextType = {
     userData,
@@ -349,12 +278,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     signup,
     logout,
     updateFilter,
-    // refreshUserData,
     notificationModalOpen,
     setNotificationModalOpen,
-    firstTimeSignUp,
     sendPasswordResetEmail,
-    getUserFilter,
 
     notificationTitle,
     setNotificationTitle,

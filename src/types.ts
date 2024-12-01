@@ -2,19 +2,15 @@
 
 export type RawUserData = {
   id: string;
-  updatedAt: string;
-  createdAt: string;
   firebaseUId: string;
   email: string;
   filter: UserFilter;
-  Listings: Listing[];
 };
 
 export type UserData = {
   id: string; // Assuming an ID field
   email: string;
   filter: UserFilter;
-  listings: Listing[];
 };
 
 // Define the AuthContextType with the User type

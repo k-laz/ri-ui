@@ -29,26 +29,16 @@ const validationSchema = Yup.object({
 
 const Filter = () => {
   const auth = useAuth();
+  const [isLoading, setIsLoading] = useState(true);
 
-  const [isLoading, setIsLoading] = useState(true); // Start with loading true
+  // Get filter from session storage userData
+  const filter = auth.userData?.filter || {};
 
-  // Add effect to handle initial data fetch
   useEffect(() => {
-    const loadUserData = async () => {
-      if (auth?.firebaseCurrentUser) {
-        try {
-          // await auth.refreshUserData(); // Your refresh function from auth context
-          await auth.getUserFilter();
-        } catch (error) {
-          console.error('Error loading user data:', error);
-        } finally {
-          setIsLoading(false);
-        }
-      }
-    };
-
-    loadUserData();
-  });
+    if (auth.userData) {
+      setIsLoading(false);
+    }
+  }, [auth.userData]);
 
   // Show loading state while either auth is loading or initial data fetch is happening
   if (isLoading || !auth?.userData) {
@@ -63,15 +53,15 @@ const Filter = () => {
   }
 
   const initialValues: Partial<UserFilter> = {
-    price_limit: auth.userData?.filter?.price_limit ?? 0,
-    move_in_date: auth.userData?.filter?.move_in_date ?? '',
-    length_of_stay: auth.userData?.filter?.length_of_stay ?? '',
-    num_baths: auth.userData?.filter?.num_baths ?? [],
-    num_beds: auth.userData?.filter?.num_beds ?? [],
-    num_parking: auth.userData?.filter?.num_parking ?? [],
-    furnished: auth.userData?.filter?.furnished ?? false,
-    pet_friendly: auth.userData?.filter?.pet_friendly ?? false,
-    gender_preference: auth.userData?.filter?.gender_preference ?? '',
+    price_limit: filter?.price_limit ?? 0,
+    move_in_date: filter?.move_in_date ?? undefined,
+    length_of_stay: filter?.length_of_stay ?? undefined,
+    num_baths: filter?.num_baths ?? [],
+    num_beds: filter?.num_beds ?? [],
+    num_parking: filter?.num_parking ?? [],
+    furnished: filter?.furnished ?? false,
+    pet_friendly: filter?.pet_friendly ?? false,
+    gender_preference: filter?.gender_preference ?? undefined,
   };
 
   const handleSubmit = async (values: Partial<UserFilter>) => {
@@ -89,6 +79,7 @@ const Filter = () => {
     <Formik
       initialValues={initialValues}
       validationSchema={validationSchema}
+      enableReinitialize={true}
       onSubmit={handleSubmit}
     >
       {({ values, setFieldValue }) => (

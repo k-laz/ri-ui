@@ -1,7 +1,8 @@
 // src/api.ts
 import { API_URL } from './constants';
 import { UserFilter, RawUserData } from './types';
-import { User } from 'firebase/auth';
+import { User, getAuth, deleteUser } from 'firebase/auth';
+const auth = getAuth();
 
 export const syncUserWithBackend = async (user: User): Promise<void> => {
   try {
@@ -71,7 +72,7 @@ export const fetchUserData = async (token: string): Promise<RawUserData> => {
 
 export const fetchUserFilter = async (token: string): Promise<UserFilter> => {
   try {
-    const response = await fetch(`${API_URL}/users/me/filter`, {
+    const response = await fetch(`${API_URL}/users/me/data`, {
       method: 'GET',
       headers: {
         Authorization: `Bearer ${token}`,
@@ -89,7 +90,7 @@ export const fetchUserFilter = async (token: string): Promise<UserFilter> => {
 };
 
 export const createUserProfile = async (firebaseUId: string, email: string) => {
-  const response = await fetch(`${API_URL}/users/add`, {
+  const response = await fetch(`${API_URL}/users/create`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -118,4 +119,30 @@ export const updateUserFilter = async (
     throw new Error('Failed to update user profile');
   }
   return response.json();
+};
+
+export const deleteUserProfile = async () => {
+  const user = auth.currentUser;
+  if (!user) {
+    throw new Error('No user is signed in');
+  }
+
+  try {
+    // First call your backend API
+    await fetch(`/users/${user.uid}`, {
+      method: 'DELETE',
+      headers: {
+        Authorization: `Bearer ${await user.getIdToken()}`,
+      },
+    });
+
+    // Then delete from Firebase Auth
+    await deleteUser(user);
+
+    // Handle successful deletion (e.g., redirect to login)
+  } catch (error) {
+    // Handle errors
+    console.error('Error deleting account:', error);
+    throw error;
+  }
 };
