@@ -1,8 +1,28 @@
-// src/api.ts
 import { API_URL } from './constants';
-import { UserFilter, RawUserData } from './types';
+import { UserFilter, UserData } from './types';
 import { User, getAuth, deleteUser } from 'firebase/auth';
 const auth = getAuth();
+
+export const resendVerificationEmail = async (email: string): Promise<void> => {
+  try {
+    const response = await fetch(`${API_URL}/auth/resend-verification`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        email: email,
+      }),
+    });
+    if (!response.ok) {
+      throw new Error('Failed to sync user with backend.');
+    }
+    console.log('User successfully synced with backend.');
+  } catch (error) {
+    console.error('Error syncing user with backend:', error);
+    throw error;
+  }
+};
 
 export const createOrSyncUserWithBackend = async (
   user: User,
@@ -29,7 +49,7 @@ export const createOrSyncUserWithBackend = async (
   }
 };
 
-export const fetchUserData = async (token: string): Promise<RawUserData> => {
+export const fetchUserData = async (token: string): Promise<UserData> => {
   try {
     const response = await fetch(`${API_URL}/users/me/data`, {
       method: 'GET',

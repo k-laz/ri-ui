@@ -24,7 +24,7 @@ import {
   fetchUserData,
   createOrSyncUserWithBackend,
 } from '../api';
-import { RawUserData, UserData, UserFilter } from '../types';
+import { UserData, UserFilter } from '../types';
 
 interface AuthContextType {
   firebaseCurrentUser: User | null;
@@ -92,7 +92,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
     try {
       const token = await currentUser.getIdToken();
-      const data: RawUserData = await fetchUserData(token);
+      const data: UserData = await fetchUserData(token);
       setUserData(data);
       sessionStorage.setItem('userData', JSON.stringify(data));
     } catch (error) {

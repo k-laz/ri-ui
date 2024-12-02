@@ -11,6 +11,7 @@ import {
 } from './pages/';
 import { PrivateRoute, Navbar } from './components/';
 import { AuthProvider } from './hooks/AuthProvider';
+import { EmailVerificationStatus } from './pages/EmailVerificationStatus';
 
 function App() {
   return (
@@ -26,6 +27,10 @@ function App() {
             <Route path="/about" element={<About />} />
             <Route path="/faq" element={<Faq />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route
+              path="/verify-email-notice"
+              element={<EmailVerificationStatus />}
+            />
             <Route element={<PrivateRoute />}>
               <Route path="/dashboard" element={<Dashboard />} />
             </Route>

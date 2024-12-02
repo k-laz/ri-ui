@@ -1,15 +1,10 @@
 // src/types.ts
 
-export type RawUserData = {
-  id: string;
-  firebaseUId: string;
-  email: string;
-  filter: UserFilter;
-};
-
 export type UserData = {
   id: string; // Assuming an ID field
   email: string;
+  isVerified: boolean;
+  verificationTokenExpires: Date;
   filter: UserFilter;
 };
 
