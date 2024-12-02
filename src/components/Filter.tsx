@@ -51,7 +51,6 @@ const Filter = () => {
 
   // Get filter from session storage userData
   const filter = auth.userData?.filter || {};
-  console.log(filter);
 
   useEffect(() => {
     if (auth.userData) {
@@ -194,12 +193,30 @@ const Filter = () => {
                           name="move_in_date"
                           type="date"
                           className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                          value={
+                            values.move_in_date
+                              ? new Date(values.move_in_date)
+                                  .toISOString()
+                                  .split('T')[0]
+                              : ''
+                          }
+                          onChange={(
+                            e: React.ChangeEvent<HTMLInputElement>,
+                          ) => {
+                            const date = e.target.value
+                              ? new Date(e.target.value)
+                              : null;
+                            setFieldValue(
+                              'move_in_date',
+                              date ? date.toISOString() : '',
+                            );
+                          }}
                         />
-                        {/* <ErrorMessage
-                        name="move_in_date"
-                        component="div"
-                        className="mt-1 text-sm text-red-600"
-                      /> */}
+                        <ErrorMessage
+                          name="move_in_date"
+                          component="div"
+                          className="mt-1 text-sm text-red-600"
+                        />
                       </div>
                     </div>
 

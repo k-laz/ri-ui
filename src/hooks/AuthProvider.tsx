@@ -234,9 +234,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     const authObserver = auth.onAuthStateChanged((user) => {
       setCurrentUser(user);
       setLoading(false);
+      refreshUserData();
     });
     return authObserver;
-  }, []);
+  }, [refreshUserData]);
 
   // Initial data load on auth state change
   useEffect(() => {

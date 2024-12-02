@@ -13,7 +13,7 @@ export default function SignUp() {
     throw new Error('useAuth must be used within an AuthProvider');
   }
 
-  const { signup } = auth;
+  const { signup, loginWithGoogle } = auth;
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -114,6 +114,24 @@ export default function SignUp() {
               </a>
             </p>
           </form>
+          <div className="mt-4 text-center">
+            <div>Or continue with</div>
+            <div className="mt-2 flex justify-center space-x-5">
+              <button
+                onClick={async () => {
+                  try {
+                    await loginWithGoogle();
+                  } catch (err) {
+                    setError('Failed to log in with Google.');
+                  }
+                }}
+                className="w-1/2 rounded-lg border border-gray-300 bg-white px-5 py-2.5 text-center text-sm font-medium text-gray-900 hover:bg-gray-100"
+              >
+                Google
+              </button>
+              {/* Add other social login buttons here if needed */}
+            </div>
+          </div>
         </div>
       </div>
     </div>
