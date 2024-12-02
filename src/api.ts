@@ -4,7 +4,9 @@ import { UserFilter, RawUserData } from './types';
 import { User, getAuth, deleteUser } from 'firebase/auth';
 const auth = getAuth();
 
-export const syncUserWithBackend = async (user: User): Promise<void> => {
+export const createOrSyncUserWithBackend = async (
+  user: User,
+): Promise<void> => {
   try {
     const response = await fetch(`${API_URL}/users/sync`, {
       method: 'POST',
@@ -23,30 +25,6 @@ export const syncUserWithBackend = async (user: User): Promise<void> => {
     console.log('User successfully synced with backend.');
   } catch (error) {
     console.error('Error syncing user with backend:', error);
-    throw error;
-  }
-};
-
-export const syncUserProfile = async (
-  token: string,
-  firebaseUId: string,
-  email: string,
-) => {
-  try {
-    const response = await fetch(`${API_URL}/users/sync`, {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${token}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ firebaseUId, email }),
-    });
-    if (!response.ok) {
-      throw new Error('Network response was not ok');
-    }
-    return response.json();
-  } catch (error) {
-    console.error('Error syncing user data:', error);
     throw error;
   }
 };
@@ -70,24 +48,24 @@ export const fetchUserData = async (token: string): Promise<RawUserData> => {
   }
 };
 
-export const fetchUserFilter = async (token: string): Promise<UserFilter> => {
-  try {
-    const response = await fetch(`${API_URL}/users/me/data`, {
-      method: 'GET',
-      headers: {
-        Authorization: `Bearer ${token}`,
-        'Content-Type': 'application/json',
-      },
-    });
-    if (!response.ok) {
-      throw new Error('Network response was not ok');
-    }
-    return response.json();
-  } catch (error) {
-    console.error('Error fetching user data:', error);
-    throw error;
-  }
-};
+// export const fetchUserFilter = async (token: string): Promise<UserFilter> => {
+//   try {
+//     const response = await fetch(`${API_URL}/users/me/data`, {
+//       method: 'GET',
+//       headers: {
+//         Authorization: `Bearer ${token}`,
+//         'Content-Type': 'application/json',
+//       },
+//     });
+//     if (!response.ok) {
+//       throw new Error('Network response was not ok');
+//     }
+//     return response.json();
+//   } catch (error) {
+//     console.error('Error fetching user data:', error);
+//     throw error;
+//   }
+// };
 
 export const createUserProfile = async (firebaseUId: string, email: string) => {
   const response = await fetch(`${API_URL}/users/create`, {
@@ -107,7 +85,7 @@ export const updateUserFilter = async (
   token: string,
   filter: Partial<UserFilter>,
 ) => {
-  const response = await fetch(`${API_URL}/users/me/filter`, {
+  const response = await fetch(`${API_URL}/filters/update`, {
     method: 'PUT',
     headers: {
       Authorization: `Bearer ${token}`,

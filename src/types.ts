@@ -26,12 +26,12 @@ export type UserFilter = {
   userid: number;
   price_limit: number;
   move_in_date: Date;
-  length_of_stay: 4 | 8 | 12;
+  length_of_stay: 4 | 8 | 12 | 'any';
   num_baths: (0 | 1 | 2 | 3 | 4)[];
   num_beds: (0 | 1 | 2 | 3 | 4)[];
   num_parking: (0 | 1 | 2 | 3 | 4)[];
   furnished: boolean;
-  pet_friendly: boolean;
+  pets: boolean;
   gender_preference: 'male' | 'female' | 'any';
 };
 

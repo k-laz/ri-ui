@@ -4,6 +4,6 @@ export { default as LogIn } from './Login';
 export { default as SignUp } from './SignUp';
 export { default as Blog } from './Blog';
 export { default as About } from './About';
-export { default as Filter } from './Filter';
+export { default as Filter } from '../components/Filter';
 export { default as Faq } from './Faq';
 export { default as ForgotPassword } from './ForgotPassword';

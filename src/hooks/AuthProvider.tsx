@@ -22,7 +22,7 @@ import {
   createUserProfile,
   updateUserFilter,
   fetchUserData,
-  syncUserProfile,
+  createOrSyncUserWithBackend,
 } from '../api';
 import { RawUserData, UserData, UserFilter } from '../types';
 
@@ -95,8 +95,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       const data: RawUserData = await fetchUserData(token);
       setUserData(data);
       sessionStorage.setItem('userData', JSON.stringify(data));
-
-      console.log(sessionStorage.getItem('userData'));
     } catch (error) {
       console.error('Error refreshing user data:', error);
       throw error;
@@ -111,11 +109,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         password,
       );
       // TODO: is this really necessary?
-      await syncUserProfile(
-        await user_credentials.user.getIdToken(),
-        email,
-        user_credentials.user.uid,
-      );
+      await createOrSyncUserWithBackend(user_credentials.user);
       navigate('/dashboard');
     } catch (error: unknown) {
       if (error instanceof Error) {
@@ -156,12 +150,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       // Sign in using a popup.
       const provider = new GoogleAuthProvider();
       const userCredential = await signInWithPopup(auth, provider);
-      console.log('LoginWithGoogle');
-      console.log(userCredential);
-      await createUserProfile(
-        userCredential.user.uid,
-        userCredential.user.email as string,
-      );
+
+      await createOrSyncUserWithBackend(userCredential.user);
 
       navigate('/dashboard');
     } catch (error: unknown) {

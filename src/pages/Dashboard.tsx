@@ -1,4 +1,4 @@
-import Filter from './Filter';
+import Filter from '../components/Filter';
 
 const Dashboard = () => {
   return <Filter />;
