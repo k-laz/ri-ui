@@ -2,6 +2,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useAuth } from '@/hooks/AuthProvider';
 import { resendVerificationEmail } from '@/api';
+import { Navigate } from 'react-router-dom';
 
 export const EmailVerificationStatus = () => {
   const { userData } = useAuth();
@@ -34,7 +35,7 @@ export const EmailVerificationStatus = () => {
   };
 
   if (!userData || userData.isVerified) {
-    return null;
+    return <Navigate to="/dashboard" />;
   }
 
   if (isTokenExpired) {

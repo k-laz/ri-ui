@@ -68,25 +68,6 @@ export const fetchUserData = async (token: string): Promise<UserData> => {
   }
 };
 
-// export const fetchUserFilter = async (token: string): Promise<UserFilter> => {
-//   try {
-//     const response = await fetch(`${API_URL}/users/me/data`, {
-//       method: 'GET',
-//       headers: {
-//         Authorization: `Bearer ${token}`,
-//         'Content-Type': 'application/json',
-//       },
-//     });
-//     if (!response.ok) {
-//       throw new Error('Network response was not ok');
-//     }
-//     return response.json();
-//   } catch (error) {
-//     console.error('Error fetching user data:', error);
-//     throw error;
-//   }
-// };
-
 export const createUserProfile = async (firebaseUId: string, email: string) => {
   const response = await fetch(`${API_URL}/users/create`, {
     method: 'POST',
