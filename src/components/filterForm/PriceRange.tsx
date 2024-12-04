@@ -1,4 +1,4 @@
-import { Field, ErrorMessage } from 'formik';
+import { ErrorMessage } from 'formik';
 import React, { useCallback } from 'react';
 
 interface PriceRangeValues {
@@ -23,56 +23,19 @@ const PriceRangeSlider: React.FC<PriceRangeSliderProps> = ({
 
   const handleMinPriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     let value = Number(e.target.value);
-    value = Math.max(0, Math.min(value, values.max_price ?? 5000));
+    // Prevent collision by keeping minimum gap of one step (10)
+    value = Math.max(0, Math.min(value, (values.max_price ?? 5000) - 10));
     setFieldValue('min_price', value);
   };
 
   const handleMaxPriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     let value = Number(e.target.value);
-    value = Math.max(values.min_price ?? 0, Math.min(value, 5000));
+    // Prevent collision by keeping minimum gap of one step (10)
+    value = Math.max((values.min_price ?? 0) + 10, Math.min(value, 5000));
     setFieldValue('max_price', value);
   };
 
-  const handleTrackClick = (
-    e: React.MouseEvent<HTMLDivElement> | React.TouchEvent<HTMLDivElement>,
-  ) => {
-    const track = e.currentTarget;
-    const rect = track.getBoundingClientRect();
-    const x = 'touches' in e ? e.touches[0].clientX : e.clientX;
-    const position = ((x - rect.left) / rect.width) * 5000;
-
-    // Determine which handle to move based on proximity
-    const distToMin = Math.abs(position - (values.min_price ?? 0));
-    const distToMax = Math.abs(position - (values.max_price ?? 5000));
-
-    if (distToMin < distToMax) {
-      setFieldValue(
-        'min_price',
-        Math.min(Math.round(position / 10) * 10, values.max_price ?? 5000),
-      );
-    } else {
-      setFieldValue(
-        'max_price',
-        Math.max(Math.round(position / 10) * 10, values.min_price ?? 0),
-      );
-    }
-  };
-
-  const handleMinBlur = () => {
-    const value = values.min_price ?? 0;
-    setFieldValue(
-      'min_price',
-      Math.max(0, Math.min(value, values.max_price ?? 5000)),
-    );
-  };
-
-  const handleMaxBlur = () => {
-    const value = values.max_price ?? 5000;
-    setFieldValue(
-      'max_price',
-      Math.max(values.min_price ?? 0, Math.min(value, 5000)),
-    );
-  };
+  // Most of the code stays the same, just update the slider container part:
 
   return (
     <div className="sm:col-span-5">
@@ -80,26 +43,27 @@ const PriceRangeSlider: React.FC<PriceRangeSliderProps> = ({
         Price Range ($CAD)
       </label>
 
-      <div className="mt-8 px-2">
-        {' '}
-        {/* Added padding for label alignment */}
-        {/* Min/Max Labels */}
-        <div className="mb-2 flex justify-between px-1">
-          <span className="text-sm text-gray-500">$0</span>
-          <span className="text-sm text-gray-500">$5000+</span>
-        </div>
-        {/* Slider Container with larger touch target */}
-        <div
-          className="relative h-12 w-full touch-none"
-          onClick={handleTrackClick}
-          onTouchStart={handleTrackClick}
-        >
-          {/* Center the actual slider within the larger touch target */}
+      <div className="mt-4">
+        {/* Slider container with space for both labels */}
+        <div className="relative h-24 w-full">
+          {/* Max value label (above thumb) */}
+          <div
+            className="absolute -top-1 -translate-y-full transform"
+            style={{
+              left: `${getPercentage(values.max_price ?? 5000)}%`,
+              transform: 'translateX(-50%) translateY(0%)',
+            }}
+          >
+            <span className="rounded bg-primary px-2 py-1 text-sm text-white">
+              ${values.max_price ?? 5000}
+              {(values.max_price ?? 5000) >= 5000 && '+'}
+            </span>
+          </div>
+
+          {/* Slider track */}
           <div className="absolute top-1/2 h-2 w-full -translate-y-1/2">
-            {/* Track background */}
             <div className="absolute h-full w-full rounded-full bg-gray-200" />
 
-            {/* Active track */}
             <div
               className="absolute h-full rounded-full bg-primary"
               style={{
@@ -116,7 +80,6 @@ const PriceRangeSlider: React.FC<PriceRangeSliderProps> = ({
               value={values.min_price ?? 0}
               onChange={handleMinPriceChange}
               className="price-range-slider pointer-events-none absolute w-full appearance-none bg-transparent"
-              aria-label="Minimum price"
             />
 
             <input
@@ -127,45 +90,20 @@ const PriceRangeSlider: React.FC<PriceRangeSliderProps> = ({
               value={values.max_price ?? 5000}
               onChange={handleMaxPriceChange}
               className="price-range-slider pointer-events-none absolute w-full appearance-none bg-transparent"
-              aria-label="Maximum price"
-            />
-          </div>
-        </div>
-        {/* Input Fields */}
-        <div className="mt-6 flex justify-between">
-          <div className="relative">
-            <Field
-              type="number"
-              name="min_price"
-              min={0}
-              max={5000}
-              step={10}
-              className="w-28 rounded-md border-2 border-primary p-2 text-center"
-              value={values.min_price ?? 0}
-              onChange={handleMinPriceChange}
-              onBlur={handleMinBlur}
             />
           </div>
 
-          <span className="self-center text-gray-500">to</span>
-
-          <div className="relative">
-            <Field
-              type="number"
-              name="max_price"
-              min={0}
-              max={5000}
-              step={10}
-              className="w-28 rounded-md border-2 border-primary p-2 pr-7 text-center"
-              value={values.max_price ?? 5000}
-              onChange={handleMaxPriceChange}
-              onBlur={handleMaxBlur}
-            />
-            {(values.max_price ?? 5000) >= 5000 && (
-              <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500">
-                +
-              </span>
-            )}
+          {/* Min value label (below thumb) */}
+          <div
+            className="absolute top-1/2 mt-4 translate-y-full transform"
+            style={{
+              left: `${getPercentage(values.min_price ?? 0)}%`,
+              transform: 'translateX(-50%) translateY(0)',
+            }}
+          >
+            <span className="rounded bg-primary px-2 py-1 text-sm text-white">
+              ${values.min_price ?? 0}
+            </span>
           </div>
         </div>
       </div>
