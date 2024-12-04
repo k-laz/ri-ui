@@ -6,9 +6,17 @@ import * as Yup from 'yup';
 import { CheckIcon, XMarkIcon } from '@heroicons/react/24/solid';
 import { useEffect, useState } from 'react';
 import { AlertMessage, AlertState, AlertType } from './ui/alert_message';
+import PriceRangeSlider from './filterForm/PriceRange';
 
 const validationSchema = Yup.object({
   price_limit: Yup.number(),
+  min_price: Yup.number()
+    .min(0, 'Minimum price cannot be less than 0')
+    .required('Required'),
+  max_price: Yup.number()
+    .min(0, 'Maximum price cannot be less than 0')
+    .max(5000, 'Maximum price cannot exceed 5000')
+    .required('Required'),
   move_in_date: Yup.date(),
   length_of_stay: Yup.string().oneOf(
     ['4', '8', '12', 'any'],
@@ -70,8 +78,11 @@ const Filter = () => {
     );
   }
 
-  const initialValues: Partial<UserFilter> = {
+  const initialValues = {
+    //Partial<UserFilter>
     price_limit: filter?.price_limit ?? 0,
+    min_price: 0,
+    max_price: 5000,
     move_in_date: filter?.move_in_date ?? undefined,
     length_of_stay: filter?.length_of_stay ?? undefined,
     num_baths: filter?.num_baths ?? [],
@@ -110,13 +121,14 @@ const Filter = () => {
       >
         {({ values, setFieldValue }) => (
           <div className="mt-8 lg:mt-20">
-            <h2 className="text-center  font-semibold leading-7 text-gray-900 lg:mt-8">
-              Your Filter
-            </h2>
             <Form className="mx-auto w-full max-w-5xl rounded-lg md:p-10">
               <div className="border-b border-gray-900/10 p-3 lg:mx-10">
                 <div className="relative mt-10 grid grid-cols-1 gap-x-6 gap-y-4 sm:grid-cols-10 sm:gap-y-8 md:gap-x-16 lg:mb-4">
                   <>
+                    <PriceRangeSlider
+                      values={values}
+                      setFieldValue={setFieldValue}
+                    />
                     {/* Budget Price Cap Slider */}
                     <div className="sm:col-span-5">
                       <label

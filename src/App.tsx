@@ -12,7 +12,7 @@ import {
 import { PrivateRoute, Navbar } from './components/';
 import { AuthProvider } from './hooks/AuthProvider';
 import { EmailVerificationStatus } from './pages/EmailVerificationStatus';
-import EmailVerification from './pages/EmailVerification';
+import EmailVerificationResponse from './pages/EmailVerificationResponse';
 
 function App() {
   return (
@@ -32,7 +32,10 @@ function App() {
               path="/verify-email-notice"
               element={<EmailVerificationStatus />}
             />
-            <Route path="/auth/verify-email" element={<EmailVerification />} />
+            <Route
+              path="/auth/verify-email"
+              element={<EmailVerificationResponse />}
+            />
             <Route element={<PrivateRoute />}>
               <Route path="/dashboard" element={<Dashboard />} />
             </Route>
