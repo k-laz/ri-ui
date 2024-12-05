@@ -6,10 +6,10 @@ import * as Yup from 'yup';
 import { CheckIcon, XMarkIcon } from '@heroicons/react/24/solid';
 import { useEffect, useState } from 'react';
 import { AlertMessage, AlertState, AlertType } from './ui/alert_message';
-import PriceRangeSlider from './filterForm/PriceRange';
+import PriceRangeSlider from './form/PriceRange';
+import NumberSelector from './form/NumberSelector';
 
 const validationSchema = Yup.object({
-  price_limit: Yup.number(),
   min_price: Yup.number()
     .min(0, 'Minimum price cannot be less than 0')
     .required('Required'),
@@ -80,7 +80,6 @@ const Filter = () => {
 
   const initialValues = {
     //Partial<UserFilter>
-    price_limit: filter?.price_limit ?? 0,
     min_price: 0,
     max_price: 5000,
     move_in_date: filter?.move_in_date ?? undefined,
@@ -123,74 +122,12 @@ const Filter = () => {
           <div className="mt-8 lg:mt-20">
             <Form className="mx-auto w-full max-w-5xl rounded-lg md:p-10">
               <div className="border-b border-gray-900/10 p-3 lg:mx-10">
+                <PriceRangeSlider
+                  values={values}
+                  setFieldValue={setFieldValue}
+                />
                 <div className="relative mt-10 grid grid-cols-1 gap-x-6 gap-y-4 sm:grid-cols-10 sm:gap-y-8 md:gap-x-16 lg:mb-4">
                   <>
-                    <PriceRangeSlider
-                      values={values}
-                      setFieldValue={setFieldValue}
-                    />
-                    {/* Budget Price Cap Slider */}
-                    <div className="sm:col-span-5">
-                      <label
-                        htmlFor="price_limit"
-                        className="block text-sm font-medium leading-6 text-gray-900"
-                      >
-                        Max Price ($CAD)
-                      </label>
-                      <div className="mb-3 mt-2">
-                        <div className="flex flex-row items-center justify-between">
-                          <Field
-                            id="price_limit"
-                            name="price_limit"
-                            type="range"
-                            min="0"
-                            max="5000"
-                            step="10"
-                            className="custom-range-slider w-2/3 appearance-none sm:w-full"
-                            style={{
-                              '--slider-value': `${
-                                ((values.price_limit ?? 0) / 5000) * 100
-                              }%`,
-                            }}
-                            value={values.price_limit ?? 0}
-                            onChange={(
-                              e: React.ChangeEvent<HTMLInputElement>,
-                            ) =>
-                              setFieldValue(
-                                'price_limit',
-                                e.target.value ? parseInt(e.target.value) : 0,
-                              )
-                            }
-                          />
-                          {/* Disabled Number Input Field */}
-                          <div className="relative">
-                            <Field
-                              id="price_limit_input"
-                              name="price_limit"
-                              type="number"
-                              min="0"
-                              max="5000"
-                              step="10"
-                              className="ml-4 min-w-20 truncate rounded-md border-2 border-primary p-1 text-center lg:pl-4"
-                              value={values.price_limit ?? 0}
-                              disabled
-                            />
-                            {/* Conditionally display + sign inside the input field */}
-                            {(values.price_limit ?? 0) >= 5000 && (
-                              <span className="absolute inset-y-0 right-12 flex items-center pr-4">
-                                +
-                              </span>
-                            )}
-                          </div>
-                        </div>
-                        <ErrorMessage
-                          name="price_limit"
-                          component="div"
-                          className="mt-1 text-sm text-red-600"
-                        />
-                      </div>
-                    </div>
-
                     {/* Move-In Date */}
                     <div className="sm:col-span-5">
                       <label
@@ -284,212 +221,26 @@ const Filter = () => {
                       </div>
                     </div>
 
-                    {/* Number of Bathrooms */}
-                    <div className="sm:col-span-5">
-                      <label
-                        htmlFor="num_baths"
-                        className="block text-sm font-medium leading-6 text-gray-900"
-                      >
-                        Number of Bathrooms
-                      </label>
-                      <div className="mt-2 flex justify-between">
-                        {[0, 1, 2, 3, 4].map((option) => (
-                          <label key={option} className="flex items-center">
-                            <Field
-                              type="checkbox"
-                              name="num_baths"
-                              value={option.toString()}
-                              className="sr-only"
-                              checked={
-                                values.num_baths?.includes(
-                                  option as 0 | 1 | 2 | 3 | 4,
-                                ) || false
-                              }
-                              onChange={(
-                                e: React.ChangeEvent<HTMLInputElement>,
-                              ) => {
-                                const value = parseInt(e.target.value) as
-                                  | 0
-                                  | 1
-                                  | 2
-                                  | 3
-                                  | 4; // Type assertion
-                                if (e.target.checked) {
-                                  setFieldValue('num_baths', [
-                                    ...(values.num_baths || []),
-                                    value,
-                                  ]);
-                                } else {
-                                  setFieldValue(
-                                    'num_baths',
-                                    values.num_baths?.filter(
-                                      (v) => v !== value,
-                                    ) || [],
-                                  );
-                                }
-                              }}
-                            />
-                            <span
-                              className={`
-                              inline-flex h-10 w-10 cursor-pointer items-center justify-center rounded-full
-                              ${
-                                values.num_baths?.includes(
-                                  option as 0 | 1 | 2 | 3 | 4,
-                                ) // Type assertion
-                                  ? 'bg-primary text-white'
-                                  : 'bg-gray-200 text-gray-700'
-                              }
-                            `}
-                            >
-                              {option === 4 ? '4+' : option}
-                            </span>
-                          </label>
-                        ))}
-                      </div>
-                      {/* <ErrorMessage
+                    <NumberSelector
                       name="num_baths"
-                      component="div"
-                      className="mt-1 text-sm text-red-600"
-                    /> */}
-                    </div>
+                      label="Number of Bathrooms"
+                      values={values}
+                      setFieldValue={setFieldValue}
+                    />
 
-                    {/* Number of Bedrooms */}
-                    <div className="sm:col-span-5">
-                      <label
-                        htmlFor="num_beds"
-                        className="block text-sm font-medium leading-6 text-gray-900"
-                      >
-                        Number of Bedrooms
-                      </label>
-                      <div className="mt-2 flex justify-between">
-                        {[0, 1, 2, 3, 4].map((option) => (
-                          <label key={option} className="flex items-center">
-                            <Field
-                              type="checkbox"
-                              name="num_beds"
-                              value={option.toString()}
-                              className="sr-only"
-                              checked={
-                                values.num_beds?.includes(
-                                  option as 0 | 1 | 2 | 3 | 4,
-                                ) || false
-                              }
-                              onChange={(
-                                e: React.ChangeEvent<HTMLInputElement>,
-                              ) => {
-                                const value = parseInt(e.target.value) as
-                                  | 0
-                                  | 1
-                                  | 2
-                                  | 3
-                                  | 4; // Type assertion
-                                if (e.target.checked) {
-                                  setFieldValue('num_beds', [
-                                    ...(values.num_beds || []),
-                                    value,
-                                  ]);
-                                } else {
-                                  setFieldValue(
-                                    'num_beds',
-                                    values.num_beds?.filter(
-                                      (v) => v !== value,
-                                    ) || [],
-                                  );
-                                }
-                              }}
-                            />
-                            <span
-                              className={`
-                              inline-flex h-10 w-10 cursor-pointer items-center justify-center rounded-full
-                              ${
-                                values.num_beds?.includes(
-                                  option as 0 | 1 | 2 | 3 | 4,
-                                ) // Type assertion
-                                  ? 'bg-primary text-white'
-                                  : 'bg-gray-200 text-gray-700'
-                              }
-                            `}
-                            >
-                              {option === 4 ? '4+' : option}
-                            </span>
-                          </label>
-                        ))}
-                      </div>
-                      {/* <ErrorMessage
+                    <NumberSelector
                       name="num_beds"
-                      component="div"
-                      className="mt-1 text-sm text-red-600"
-                    /> */}
-                    </div>
+                      label="Number of Bedrooms"
+                      values={values}
+                      setFieldValue={setFieldValue}
+                    />
 
-                    {/* Number of Parking Spots */}
-                    <div className="sm:col-span-5">
-                      <label
-                        htmlFor="num_parking"
-                        className="block text-sm font-medium leading-6 text-gray-900"
-                      >
-                        Number of Parking Spots
-                      </label>
-                      <div className="mt-2 flex justify-between">
-                        {[0, 1, 2, 3, 4].map((option) => (
-                          <label key={option} className="flex items-center">
-                            <Field
-                              type="checkbox"
-                              name="num_parking"
-                              value={option.toString()}
-                              className="sr-only"
-                              checked={
-                                values.num_parking?.includes(
-                                  option as 0 | 1 | 2 | 3 | 4,
-                                ) || false
-                              } // Type assertion
-                              onChange={(
-                                e: React.ChangeEvent<HTMLInputElement>,
-                              ) => {
-                                const value = parseInt(e.target.value) as
-                                  | 0
-                                  | 1
-                                  | 2
-                                  | 3
-                                  | 4; // Type assertion
-                                if (e.target.checked) {
-                                  setFieldValue('num_parking', [
-                                    ...(values.num_parking || []),
-                                    value,
-                                  ]);
-                                } else {
-                                  setFieldValue(
-                                    'num_parking',
-                                    values.num_parking?.filter(
-                                      (v) => v !== value,
-                                    ) || [],
-                                  );
-                                }
-                              }}
-                            />
-                            <span
-                              className={`
-                              inline-flex h-10 w-10 cursor-pointer items-center justify-center rounded-full
-                              ${
-                                values.num_parking?.includes(
-                                  option as 0 | 1 | 2 | 3 | 4,
-                                ) // Type assertion
-                                  ? 'bg-primary text-white'
-                                  : 'bg-gray-200 text-gray-700'
-                              }
-                            `}
-                            >
-                              {option === 4 ? '4+' : option}
-                            </span>
-                          </label>
-                        ))}
-                      </div>
-                      {/* <ErrorMessage
+                    <NumberSelector
                       name="num_parking"
-                      component="div"
-                      className="mt-1 text-sm text-red-600"
-                    /> */}
-                    </div>
+                      label="Number of Parking Spots"
+                      values={values}
+                      setFieldValue={setFieldValue}
+                    />
 
                     <hr className="md:hidden"></hr>
 
