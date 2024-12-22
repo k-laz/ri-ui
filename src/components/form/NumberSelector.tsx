@@ -6,10 +6,8 @@ type NumberOption = 0 | 1 | 2 | 3 | 4;
 interface NumberSelectorProps {
   name: string;
   label: string;
-  values: {
-    [key: string]: NumberOption[];
-  };
-  setFieldValue: (field: string, value: any) => void;
+  values: NumberOption[];
+  setFieldValue: (field: string, value: NumberOption[]) => void;
 }
 
 const NumberSelector: React.FC<NumberSelectorProps> = ({
@@ -23,9 +21,9 @@ const NumberSelector: React.FC<NumberSelectorProps> = ({
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = parseInt(e.target.value) as NumberOption;
     if (e.target.checked) {
-      setFieldValue(name, [...(values[name] || []), value]);
+      setFieldValue(name, [...(values || []), value]);
     } else {
-      setFieldValue(name, values[name]?.filter((v) => v !== value) || []);
+      setFieldValue(name, values?.filter((v) => v !== value) || []);
     }
   };
 
@@ -45,14 +43,14 @@ const NumberSelector: React.FC<NumberSelectorProps> = ({
               name={name}
               value={option.toString()}
               className="sr-only"
-              checked={values[name]?.includes(option) || false}
+              checked={values?.includes(option) || false}
               onChange={handleChange}
             />
             <span
               className={`
                 inline-flex h-10 w-10 cursor-pointer items-center justify-center rounded-full
                 ${
-                  values[name]?.includes(option)
+                  values?.includes(option)
                     ? 'bg-primary text-white'
                     : 'bg-gray-200 text-gray-700'
                 }

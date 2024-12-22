@@ -8,15 +8,13 @@ import { useEffect, useState } from 'react';
 import { AlertMessage, AlertState, AlertType } from './ui/alert_message';
 import PriceRangeSlider from './form/PriceRange';
 import NumberSelector from './form/NumberSelector';
+import LoadingSpinner from './LoadingSpinner';
 
 const validationSchema = Yup.object({
-  min_price: Yup.number()
-    .min(0, 'Minimum price cannot be less than 0')
-    .required('Required'),
+  min_price: Yup.number().min(0, 'Minimum price cannot be less than 0'),
   max_price: Yup.number()
     .min(0, 'Maximum price cannot be less than 0')
-    .max(5000, 'Maximum price cannot exceed 5000')
-    .required('Required'),
+    .max(5000, 'Maximum price cannot exceed 5000'),
   move_in_date: Yup.date(),
   length_of_stay: Yup.string().oneOf(
     ['4', '8', '12', 'any'],
@@ -68,20 +66,13 @@ const Filter = () => {
 
   // Show loading state while either auth is loading or initial data fetch is happening
   if (isLoading || !auth?.userData) {
-    return (
-      <div className="flex h-2/3 items-center justify-center">
-        <div className="text-center">
-          <div className="mx-auto h-12 w-12 animate-spin rounded-full border-b-2 border-t-2 border-primary"></div>
-          <p className="mt-4 text-gray-600">Loading your filter settings...</p>
-        </div>
-      </div>
-    );
+    return <LoadingSpinner />;
   }
 
   const initialValues = {
     //Partial<UserFilter>
-    min_price: 0,
-    max_price: 5000,
+    min_price: filter?.min_price ?? 0,
+    max_price: filter?.max_price ?? 5000,
     move_in_date: filter?.move_in_date ?? undefined,
     length_of_stay: filter?.length_of_stay ?? undefined,
     num_baths: filter?.num_baths ?? [],
@@ -123,7 +114,8 @@ const Filter = () => {
             <Form className="mx-auto w-full max-w-5xl rounded-lg md:p-10">
               <div className="border-b border-gray-900/10 p-3 lg:mx-10">
                 <PriceRangeSlider
-                  values={values}
+                  min_price={values.min_price}
+                  max_price={values.max_price}
                   setFieldValue={setFieldValue}
                 />
                 <div className="relative mt-10 grid grid-cols-1 gap-x-6 gap-y-4 sm:grid-cols-10 sm:gap-y-8 md:gap-x-16 lg:mb-4">
@@ -224,21 +216,21 @@ const Filter = () => {
                     <NumberSelector
                       name="num_baths"
                       label="Number of Bathrooms"
-                      values={values}
+                      values={values.num_baths}
                       setFieldValue={setFieldValue}
                     />
 
                     <NumberSelector
                       name="num_beds"
                       label="Number of Bedrooms"
-                      values={values}
+                      values={values.num_beds}
                       setFieldValue={setFieldValue}
                     />
 
                     <NumberSelector
                       name="num_parking"
                       label="Number of Parking Spots"
-                      values={values}
+                      values={values.num_parking}
                       setFieldValue={setFieldValue}
                     />
 

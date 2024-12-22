@@ -25,6 +25,7 @@ import {
   createOrSyncUserWithBackend,
 } from '../api';
 import { UserData, UserFilter } from '../types';
+import LoadingSpinner from '@/components/LoadingSpinner';
 
 interface AuthContextType {
   firebaseCurrentUser: User | null;
@@ -39,6 +40,7 @@ interface AuthContextType {
   setNotificationModalOpen: unknown;
   notificationTitle: unknown;
   setNotificationTitle: unknown;
+  isAuthReady: boolean;
 }
 
 const initialUserData = {};
@@ -85,7 +87,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   });
   const [notificationModalOpen, setNotificationModalOpen] = useState(false);
   const [notificationTitle, setNotificationTitle] = useState('');
-  const [loading, setLoading] = useState(true);
+  const [isAuthReady, setIsAuthReady] = useState(false);
 
   const refreshUserData = useCallback(async () => {
     if (!currentUser) return;
@@ -231,13 +233,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
   // Watch for Auth User Change
   useEffect(() => {
-    const authObserver = auth.onAuthStateChanged((user) => {
+    const unsubscribe = auth.onAuthStateChanged((user) => {
       setCurrentUser(user);
-      setLoading(false);
-      refreshUserData();
+      if (!user) {
+        // Clear user data if logged out
+        setUserData(initialUserData);
+        sessionStorage.removeItem('userData');
+      }
+      // Mark auth as ready only after we have the initial state
+      setIsAuthReady(true);
     });
-    return authObserver;
-  }, [refreshUserData]);
+
+    return unsubscribe;
+  }, []);
 
   // Initial data load on auth state change
   useEffect(() => {
@@ -261,6 +269,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     };
   }, [currentUser, refreshUserData]);
 
+  // Only render children once auth is ready
+  if (!isAuthReady) {
+    return <LoadingSpinner />;
+  }
+
   const value: AuthContextType = {
     userData,
     firebaseCurrentUser: currentUser,
@@ -272,14 +285,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     notificationModalOpen,
     setNotificationModalOpen,
     sendPasswordResetEmail,
+    isAuthReady,
 
     notificationTitle,
     setNotificationTitle,
   };
 
-  return (
-    <AuthContext.Provider value={value}>
-      {!loading && children}
-    </AuthContext.Provider>
-  );
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };

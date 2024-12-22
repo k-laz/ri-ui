@@ -19,7 +19,8 @@ export type AuthContextType = {
 export type UserFilter = {
   id: number;
   userid: number;
-  price_limit: number;
+  max_price: number;
+  min_price: number;
   move_in_date: Date;
   length_of_stay: 4 | 8 | 12 | 'any';
   num_baths: (0 | 1 | 2 | 3 | 4)[];

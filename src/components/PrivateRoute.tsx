@@ -2,15 +2,20 @@ import { Navigate, Outlet } from 'react-router-dom';
 import { useAuth } from '@/hooks/AuthProvider';
 
 const PrivateRoute = () => {
-  const { firebaseCurrentUser, userData } = useAuth();
+  const { firebaseCurrentUser, userData, isAuthReady } = useAuth();
 
-  console.log('INSIDE PRIVATE ROUTE: ' + userData);
+  // Show nothing while auth is initializing to prevent flash
+  if (!isAuthReady) {
+    return null;
+  }
 
-  if (!firebaseCurrentUser) return <Navigate to="/login" />;
+  // Only redirect once we're sure about the auth state
+  if (!firebaseCurrentUser) {
+    return <Navigate to="/login" replace />;
+  }
 
   if (!userData?.isVerified) {
-    console.log('YES');
-    return <Navigate to="/verify-email-notice" />;
+    return <Navigate to="/verify-email-notice" replace />;
   }
 
   return <Outlet />;

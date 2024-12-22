@@ -1,19 +1,15 @@
 import React, { useCallback } from 'react';
 import { ErrorMessage } from 'formik';
 
-interface PriceRangeValues {
+interface PriceRangeSliderProps {
   min_price?: number;
   max_price?: number;
-  [key: string]: any;
-}
-
-interface PriceRangeSliderProps {
-  values: PriceRangeValues;
-  setFieldValue: (field: string, value: any) => void;
+  setFieldValue: (field: string, value: number) => void;
 }
 
 const PriceRangeSlider: React.FC<PriceRangeSliderProps> = ({
-  values,
+  min_price,
+  max_price,
   setFieldValue,
 }) => {
   const getPercentage = useCallback(
@@ -23,13 +19,13 @@ const PriceRangeSlider: React.FC<PriceRangeSliderProps> = ({
 
   const handleMinPriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     let value = Number(e.target.value);
-    value = Math.max(0, Math.min(value, (values.max_price ?? 5000) - 10));
+    value = Math.max(0, Math.min(value, (max_price ?? 5000) - 10));
     setFieldValue('min_price', value);
   };
 
   const handleMaxPriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     let value = Number(e.target.value);
-    value = Math.max((values.min_price ?? 0) + 10, Math.min(value, 5000));
+    value = Math.max((min_price ?? 0) + 10, Math.min(value, 5000));
     setFieldValue('max_price', value);
   };
 
@@ -44,13 +40,13 @@ const PriceRangeSlider: React.FC<PriceRangeSliderProps> = ({
         <div
           className="absolute top-0 transform"
           style={{
-            left: `${getPercentage(values.max_price ?? 5000)}%`,
+            left: `${getPercentage(max_price ?? 5000)}%`,
             transform: 'translateX(-50%)',
           }}
         >
           <span className="rounded bg-primary px-2 py-1 text-sm text-white">
-            ${values.max_price ?? 5000}
-            {(values.max_price ?? 5000) >= 5000 && '+'}
+            ${max_price ?? 5000}
+            {(max_price ?? 5000) >= 5000 && '+'}
           </span>
         </div>
 
@@ -61,8 +57,8 @@ const PriceRangeSlider: React.FC<PriceRangeSliderProps> = ({
           <div
             className="absolute h-full rounded-full bg-primary"
             style={{
-              left: `${getPercentage(values.min_price ?? 0)}%`,
-              right: `${100 - getPercentage(values.max_price ?? 5000)}%`,
+              left: `${getPercentage(min_price ?? 0)}%`,
+              right: `${100 - getPercentage(max_price ?? 5000)}%`,
             }}
           />
 
@@ -71,7 +67,7 @@ const PriceRangeSlider: React.FC<PriceRangeSliderProps> = ({
             min={0}
             max={5000}
             step={10}
-            value={values.min_price ?? 0}
+            value={min_price ?? 0}
             onChange={handleMinPriceChange}
             className="price-range-slider pointer-events-none absolute w-full appearance-none bg-transparent"
           />
@@ -81,7 +77,7 @@ const PriceRangeSlider: React.FC<PriceRangeSliderProps> = ({
             min={0}
             max={5000}
             step={10}
-            value={values.max_price ?? 5000}
+            value={max_price ?? 5000}
             onChange={handleMaxPriceChange}
             className="price-range-slider pointer-events-none absolute w-full appearance-none bg-transparent"
           />
@@ -91,12 +87,12 @@ const PriceRangeSlider: React.FC<PriceRangeSliderProps> = ({
         <div
           className="absolute top-1/2 mt-4 translate-y-full transform"
           style={{
-            left: `${getPercentage(values.min_price ?? 0)}%`,
+            left: `${getPercentage(min_price ?? 0)}%`,
             transform: 'translateX(-50%) translateY(0)',
           }}
         >
           <span className="rounded bg-primary px-2 py-1 text-sm text-white">
-            ${values.min_price ?? 0}
+            ${min_price ?? 0}
           </span>
         </div>
       </div>
