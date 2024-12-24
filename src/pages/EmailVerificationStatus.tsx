@@ -1,11 +1,11 @@
 // components/EmailVerificationStatus.tsx
 import { useCallback, useEffect, useState } from 'react';
-import { useAuth } from '@/hooks/AuthProvider';
 import { resendVerificationEmail } from '@/api';
 import { Navigate } from 'react-router-dom';
+import { useUserStore } from '@/hooks/useUser';
 
 export const EmailVerificationStatus = () => {
-  const { userData } = useAuth();
+  const { userData } = useUserStore();
   const [isResending, setIsResending] = useState(false);
   const [message, setMessage] = useState('');
   const [isTokenExpired, setIsTokenExpired] = useState(false);
