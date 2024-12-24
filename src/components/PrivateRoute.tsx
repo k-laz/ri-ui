@@ -1,8 +1,10 @@
 import { Navigate, Outlet } from 'react-router-dom';
 import { useAuth } from '@/hooks/AuthProvider';
+import { useUserStore } from '@/hooks/useUser';
 
 const PrivateRoute = () => {
-  const { firebaseCurrentUser, userData, isAuthReady } = useAuth();
+  const { currentUser, isAuthReady } = useAuth();
+  const { userData } = useUserStore();
 
   // Show nothing while auth is initializing to prevent flash
   if (!isAuthReady) {
@@ -10,7 +12,7 @@ const PrivateRoute = () => {
   }
 
   // Only redirect once we're sure about the auth state
-  if (!firebaseCurrentUser) {
+  if (!currentUser) {
     return <Navigate to="/login" replace />;
   }
 

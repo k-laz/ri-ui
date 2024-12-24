@@ -4,6 +4,8 @@ import React, {
   useCallback,
   useContext,
   useEffect,
+  useMemo,
+  useRef,
   useState,
 } from 'react';
 import {
@@ -24,12 +26,14 @@ import {
   fetchUserData,
   createOrSyncUserWithBackend,
 } from '../api';
-import { UserData, UserFilter } from '../types';
+import { UserFilter } from '../types';
 import LoadingSpinner from '@/components/LoadingSpinner';
+import { useUserStore } from './useUser';
+import { debounce, DebouncedFunc } from 'lodash';
 
 interface AuthContextType {
-  firebaseCurrentUser: User | null;
-  userData: UserData;
+  currentUser: User | null;
+
   login: (email: string, password: string) => Promise<void>;
   loginWithGoogle: () => Promise<void>;
   signup: (email: string, password: string) => Promise<void>;
@@ -41,9 +45,9 @@ interface AuthContextType {
   notificationTitle: unknown;
   setNotificationTitle: unknown;
   isAuthReady: boolean;
-}
 
-const initialUserData = {};
+  refreshUserData: DebouncedFunc<() => Promise<void>>;
+}
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -80,28 +84,67 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
   const navigate = useNavigate();
-  const [currentUser, setCurrentUser] = useState<User | null>(auth.currentUser);
-  const [userData, setUserData] = useState(() => {
-    const data = sessionStorage.getItem('userData');
-    return data ? JSON.parse(data) : initialUserData;
-  });
+  const { setUserData, clearUserData, lastFetched } = useUserStore();
+  const [currentUser, setCurrentUser] = useState<User | null>(null);
+  const refreshTimeoutRef = useRef<NodeJS.Timeout>();
+
   const [notificationModalOpen, setNotificationModalOpen] = useState(false);
   const [notificationTitle, setNotificationTitle] = useState('');
   const [isAuthReady, setIsAuthReady] = useState(false);
 
   const refreshUserData = useCallback(async () => {
     if (!currentUser) return;
-
+    console.log('refresh');
     try {
       const token = await currentUser.getIdToken();
-      const data: UserData = await fetchUserData(token);
+      const data = await fetchUserData(token);
       setUserData(data);
-      sessionStorage.setItem('userData', JSON.stringify(data));
     } catch (error) {
       console.error('Error refreshing user data:', error);
-      throw error;
     }
-  }, [currentUser]);
+  }, [currentUser, setUserData]);
+
+  // Create the debounced version outside of useCallback
+  const debouncedRefresh = useMemo(
+    () => debounce(refreshUserData, 2000),
+    [refreshUserData],
+  );
+
+  // Cleanup the debounced function when the component unmounts
+  useEffect(() => {
+    return () => {
+      debouncedRefresh.cancel();
+    };
+  }, [debouncedRefresh]);
+
+  // Auth state observer
+  useEffect(() => {
+    const timeoutRef: NodeJS.Timeout | undefined = refreshTimeoutRef.current;
+
+    const unsubscribe = auth.onAuthStateChanged((user) => {
+      setCurrentUser(user);
+      setIsAuthReady(true);
+
+      if (!user) {
+        clearUserData();
+        return;
+      }
+
+      // Only refresh if data is stale (older than 5 minutes)
+      const isStale = !lastFetched || Date.now() - lastFetched > 5 * 60 * 1000;
+      if (isStale) {
+        refreshUserData();
+      }
+    });
+
+    return () => {
+      unsubscribe();
+      // Use the captured value instead of accessing the ref directly
+      if (timeoutRef) {
+        clearTimeout(timeoutRef);
+      }
+    };
+  }, [clearUserData, lastFetched, refreshUserData]);
 
   const login = async (email: string, password: string): Promise<void> => {
     try {
@@ -197,10 +240,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   };
 
+  // Remove the sessionStorage setItem since we're using Zustand now
   const logout = async (): Promise<void> => {
     try {
       await signOut(auth);
-      setUserData(initialUserData);
+      clearUserData(); // Use clearUserData instead of setUserData(initialUserData)
       navigate('/');
     } catch (error: unknown) {
       if (error instanceof Error) {
@@ -231,52 +275,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     [currentUser, refreshUserData],
   );
 
-  // Watch for Auth User Change
-  useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged((user) => {
-      setCurrentUser(user);
-      if (!user) {
-        // Clear user data if logged out
-        setUserData(initialUserData);
-        sessionStorage.removeItem('userData');
-      }
-      // Mark auth as ready only after we have the initial state
-      setIsAuthReady(true);
-    });
-
-    return unsubscribe;
-  }, []);
-
-  // Initial data load on auth state change
-  useEffect(() => {
-    let isMounted = true;
-
-    const loadInitialData = async () => {
-      if (!currentUser) {
-        sessionStorage.removeItem('userData');
-        setUserData(initialUserData);
-        return;
-      }
-
-      if (isMounted) {
-        await refreshUserData();
-      }
-    };
-
-    loadInitialData();
-    return () => {
-      isMounted = false;
-    };
-  }, [currentUser, refreshUserData]);
-
   // Only render children once auth is ready
   if (!isAuthReady) {
     return <LoadingSpinner />;
   }
 
   const value: AuthContextType = {
-    userData,
-    firebaseCurrentUser: currentUser,
+    currentUser,
     loginWithGoogle,
     login,
     signup,
@@ -286,6 +291,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     setNotificationModalOpen,
     sendPasswordResetEmail,
     isAuthReady,
+    refreshUserData: debouncedRefresh,
 
     notificationTitle,
     setNotificationTitle,
