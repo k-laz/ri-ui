@@ -43,7 +43,15 @@ export default function About() {
     },
   ];
 
-  const renderSection = (section: any) => {
+  interface Section {
+    id: string;
+    title: string;
+    content: string;
+    variant: string;
+    icon?: string;
+  }
+
+  const renderSection = (section: Section) => {
     switch (section.variant) {
       case 'centered':
         return (

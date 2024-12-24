@@ -4,11 +4,12 @@ import { Switch } from '@headlessui/react';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import { CheckIcon, XMarkIcon } from '@heroicons/react/24/solid';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { AlertMessage, AlertState, AlertType } from './ui/alert_message';
 import PriceRangeSlider from './form/PriceRange';
 import NumberSelector from './form/NumberSelector';
 import LoadingSpinner from './LoadingSpinner';
+import { useUserStore } from '@/hooks/useUser';
 
 const validationSchema = Yup.object({
   min_price: Yup.number().min(0, 'Minimum price cannot be less than 0'),
@@ -39,7 +40,8 @@ const validationSchema = Yup.object({
 
 const Filter = () => {
   const auth = useAuth();
-  const [isLoading, setIsLoading] = useState(true);
+  const { userData } = useUserStore(); // This is good, using Zustand store
+  const [isLoading, setIsLoading] = useState(false); // Changed initial to false since we're using userData
   // TODO: could possibly integrate all of this show and close into the alert itself??
   const [alert, setAlert] = useState<AlertState>({
     show: false,
@@ -55,17 +57,14 @@ const Filter = () => {
     setAlert((prev) => ({ ...prev, show: false }));
   };
 
-  // Get filter from session storage userData
-  const filter = auth.userData?.filter || {};
+  if (!userData) {
+    return <LoadingSpinner />;
+  }
 
-  useEffect(() => {
-    if (auth.userData) {
-      setIsLoading(false);
-    }
-  }, [auth.userData]);
+  const filter: UserFilter = userData.filter;
 
   // Show loading state while either auth is loading or initial data fetch is happening
-  if (isLoading || !auth?.userData) {
+  if (isLoading || !userData) {
     return <LoadingSpinner />;
   }
 
@@ -110,14 +109,19 @@ const Filter = () => {
         onSubmit={handleSubmit}
       >
         {({ values, setFieldValue }) => (
-          <div className="mt-8 lg:mt-20">
+          <div className="mt-4 lg:mt-8">
             <Form className="mx-auto w-full max-w-5xl rounded-lg md:p-10">
               <div className="border-b border-gray-900/10 p-3 lg:mx-10">
-                <PriceRangeSlider
-                  min_price={values.min_price}
-                  max_price={values.max_price}
-                  setFieldValue={setFieldValue}
-                />
+                <div className="flex w-full justify-center">
+                  <div className="w-full max-w-2xl">
+                    <PriceRangeSlider
+                      min_price={values.min_price}
+                      max_price={values.max_price}
+                      setFieldValue={setFieldValue}
+                    />
+                  </div>
+                </div>
+
                 <div className="relative mt-10 grid grid-cols-1 gap-x-6 gap-y-4 sm:grid-cols-10 sm:gap-y-8 md:gap-x-16 lg:mb-4">
                   <>
                     {/* Move-In Date */}
