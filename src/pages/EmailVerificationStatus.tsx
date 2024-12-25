@@ -3,9 +3,12 @@ import { useCallback, useEffect, useState } from 'react';
 import { resendVerificationEmail } from '@/api';
 import { Navigate } from 'react-router-dom';
 import { useUserStore } from '@/hooks/useUser';
+import { useAuth } from '@/hooks/AuthProvider';
+import LoadingSpinner from '@/components/LoadingSpinner';
 
 export const EmailVerificationStatus = () => {
   const { userData } = useUserStore();
+  const { currentUser } = useAuth();
   const [isResending, setIsResending] = useState(false);
   const [message, setMessage] = useState('');
   const [isTokenExpired, setIsTokenExpired] = useState(false);
@@ -22,6 +25,24 @@ export const EmailVerificationStatus = () => {
     checkTokenStatus();
   }, [userData, checkTokenStatus]);
 
+  // If there's no currentUser, redirect to login
+  if (!currentUser) {
+    return <Navigate to="/login" />;
+  }
+
+  // If we're waiting for userData to load, show loading
+  if (!userData) {
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <LoadingSpinner />
+      </div>
+    );
+  }
+
+  if (userData.isVerified) {
+    return <Navigate to="/dashboard" />;
+  }
+
   const handleResendVerification = async () => {
     try {
       setIsResending(true);
@@ -33,10 +54,6 @@ export const EmailVerificationStatus = () => {
       setIsResending(false);
     }
   };
-
-  if (!userData || userData.isVerified) {
-    return <Navigate to="/dashboard" />;
-  }
 
   if (isTokenExpired) {
     return (

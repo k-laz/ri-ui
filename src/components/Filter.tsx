@@ -40,7 +40,7 @@ const validationSchema = Yup.object({
 
 const Filter = () => {
   const auth = useAuth();
-  const { userData } = useUserStore(); // This is good, using Zustand store
+  const { userData } = useUserStore(); // Zustand store
   const [isLoading, setIsLoading] = useState(false); // Changed initial to false since we're using userData
   // TODO: could possibly integrate all of this show and close into the alert itself??
   const [alert, setAlert] = useState<AlertState>({
@@ -57,16 +57,12 @@ const Filter = () => {
     setAlert((prev) => ({ ...prev, show: false }));
   };
 
-  if (!userData) {
-    return <LoadingSpinner />;
-  }
-
-  const filter: UserFilter = userData.filter;
-
   // Show loading state while either auth is loading or initial data fetch is happening
   if (isLoading || !userData) {
     return <LoadingSpinner />;
   }
+
+  const filter: UserFilter = userData.filter;
 
   const initialValues = {
     //Partial<UserFilter>
@@ -220,21 +216,21 @@ const Filter = () => {
                     <NumberSelector
                       name="num_baths"
                       label="Number of Bathrooms"
-                      values={values.num_baths}
+                      values={values.num_baths ?? []}
                       setFieldValue={setFieldValue}
                     />
 
                     <NumberSelector
                       name="num_beds"
                       label="Number of Bedrooms"
-                      values={values.num_beds}
+                      values={values.num_beds ?? []}
                       setFieldValue={setFieldValue}
                     />
 
                     <NumberSelector
                       name="num_parking"
                       label="Number of Parking Spots"
-                      values={values.num_parking}
+                      values={values.num_parking ?? []}
                       setFieldValue={setFieldValue}
                     />
 
