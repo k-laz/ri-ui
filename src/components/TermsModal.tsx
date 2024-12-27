@@ -62,7 +62,7 @@ const TermsModal = () => {
             <h3 className="mb-2 font-semibold">5. Contact Us</h3>
             <p className="text-gray-600">
               If you have any questions about these terms or your data, please
-              contact us at [rental-insight.com].
+              contact us at [newsletter@rentalsinsight.com].
             </p>
           </section>
 

@@ -25,6 +25,7 @@ import {
   updateUserFilter,
   fetchUserData,
   createOrSyncUserWithBackend,
+  unsubscribe,
 } from '../api';
 import { UserFilter } from '../types';
 import LoadingSpinner from '@/components/LoadingSpinner';
@@ -94,7 +95,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const refreshUserData = useCallback(async () => {
     if (!currentUser) return;
-    console.log('refresh');
     try {
       const token = await currentUser.getIdToken();
       const data = await fetchUserData(token);
@@ -121,7 +121,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   useEffect(() => {
     const timeoutRef: NodeJS.Timeout | undefined = refreshTimeoutRef.current;
 
-    const unsubscribe = auth.onAuthStateChanged((user) => {
+    const stopAuthListener = auth.onAuthStateChanged((user) => {
       setCurrentUser(user);
       setIsAuthReady(true);
 
@@ -138,8 +138,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     });
 
     return () => {
-      unsubscribe();
-      // Use the captured value instead of accessing the ref directly
+      stopAuthListener();
       if (timeoutRef) {
         clearTimeout(timeoutRef);
       }
@@ -174,7 +173,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const sendPasswordResetEmail = async (email: string): Promise<void> => {
     try {
       await firebaseSendPasswordResetEmail(auth, email);
-      console.log('Password reset email sent');
     } catch (error: unknown) {
       if (error instanceof Error) {
         const firebaseError = error as AuthError;

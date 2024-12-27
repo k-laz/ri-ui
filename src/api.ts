@@ -108,7 +108,7 @@ export const deleteUserProfile = async () => {
 
   try {
     // First call your backend API
-    await fetch(`/users/${user.uid}`, {
+    await fetch(`${API_URL}/users/${user.uid}`, {
       method: 'DELETE',
       headers: {
         Authorization: `Bearer ${await user.getIdToken()}`,
@@ -124,4 +124,16 @@ export const deleteUserProfile = async () => {
     console.error('Error deleting account:', error);
     throw error;
   }
+};
+
+export const unsubscribe = async (token: string) => {
+  const response = await fetch(`${API_URL}/users/unsubscribe`, {
+    method: 'PATCH',
+    body: JSON.stringify({ token }),
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to update user profile');
+  }
+  return response.json();
 };

@@ -13,6 +13,7 @@ import { PrivateRoute, Navbar } from './components/';
 import { AuthProvider } from './hooks/AuthProvider';
 import { EmailVerificationStatus } from './pages/EmailVerificationStatus';
 import EmailVerificationResponse from './pages/EmailVerificationResponse';
+import UnsubscribePage from './pages/Unsubscribe';
 
 function App() {
   return (
@@ -28,6 +29,7 @@ function App() {
             <Route path="/about" element={<About />} />
             <Route path="/faq" element={<Faq />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/unsubscribe" element={<UnsubscribePage />} />
             <Route
               path="/verify-email-notice"
               element={<EmailVerificationStatus />}

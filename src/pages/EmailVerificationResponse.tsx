@@ -1,10 +1,12 @@
 import { API_URL } from '@/constants';
+import { useAuth } from '@/hooks/AuthProvider';
 import { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 
 function EmailVerification() {
   const [searchParams] = useSearchParams();
   const [status, setStatus] = useState('verifying');
+  const { refreshUserData } = useAuth();
 
   useEffect(() => {
     const verifyEmail = async () => {
@@ -17,11 +19,8 @@ function EmailVerification() {
           },
         );
 
-        const data = await response.json();
-
-        console.log('data: ' + data);
-
         if (response.ok) {
+          refreshUserData();
           setStatus('success');
         } else {
           setStatus('error');
@@ -32,7 +31,7 @@ function EmailVerification() {
     };
 
     verifyEmail();
-  }, [searchParams]);
+  }, [refreshUserData, searchParams]);
 
   if (status === 'verifying') {
     return <div>Verifying your email...</div>;

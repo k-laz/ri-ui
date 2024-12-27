@@ -14,7 +14,7 @@ const Navbar = () => {
   const { currentUser, logout } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  // print user token for dev
+  // print user token for DEV
   currentUser?.getIdToken().then((data) => console.log(data));
 
   return (
