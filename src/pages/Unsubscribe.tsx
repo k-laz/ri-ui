@@ -19,6 +19,7 @@ export default function UnsubscribePage() {
       }
 
       try {
+        setStatus('loading');
         await unsubscribe(token);
         setStatus('success');
       } catch (error) {

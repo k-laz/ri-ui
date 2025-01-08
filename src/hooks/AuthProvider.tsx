@@ -25,7 +25,6 @@ import {
   updateUserFilter,
   fetchUserData,
   createOrSyncUserWithBackend,
-  unsubscribe,
 } from '../api';
 import { UserFilter } from '../types';
 import LoadingSpinner from '@/components/LoadingSpinner';

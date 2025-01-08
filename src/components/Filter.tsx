@@ -1,15 +1,15 @@
 import { useAuth } from '@/hooks/AuthProvider';
 import { UserFilter } from '@/types';
-import { Switch } from '@headlessui/react';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
-import { CheckIcon, XMarkIcon } from '@heroicons/react/24/solid';
+
 import { useState } from 'react';
 import { AlertMessage, AlertState, AlertType } from './ui/alert_message';
-import PriceRangeSlider from './form/PriceRange';
 import NumberSelector from './form/NumberSelector';
 import LoadingSpinner from './LoadingSpinner';
 import { useUserStore } from '@/hooks/useUser';
+import PriceRangeSelector from './form/PriceRangeSelector';
+import FilterToggle from './form/FilterToggle';
 
 const validationSchema = Yup.object({
   min_price: Yup.number().min(0, 'Minimum price cannot be less than 0'),
@@ -108,18 +108,20 @@ const Filter = () => {
           <div className="mt-4 lg:mt-8">
             <Form className="mx-auto w-full max-w-5xl rounded-lg md:p-10">
               <div className="border-b border-gray-900/10 p-3 lg:mx-10">
-                <div className="flex w-full justify-center">
-                  <div className="w-full max-w-2xl">
+                {/* <div className="w-full max-w-2xl justify-center">
                     <PriceRangeSlider
                       min_price={values.min_price}
                       max_price={values.max_price}
                       setFieldValue={setFieldValue}
                     />
-                  </div>
-                </div>
-
+                  </div> */}
                 <div className="relative mt-10 grid grid-cols-1 gap-x-6 gap-y-4 sm:grid-cols-10 sm:gap-y-8 md:gap-x-16 lg:mb-4">
                   <>
+                    <PriceRangeSelector
+                      min_price={values.min_price}
+                      max_price={values.max_price}
+                      setFieldValue={setFieldValue}
+                    />
                     {/* Move-In Date */}
                     <div className="sm:col-span-5">
                       <label
@@ -236,52 +238,27 @@ const Filter = () => {
 
                     <hr className="md:hidden"></hr>
 
-                    {/* Furnished Toggle */}
                     <div className="sm:col-span-2">
-                      <label
-                        htmlFor="furnished"
-                        className="block text-sm font-medium leading-6 text-gray-900"
-                      >
+                      <label className="block text-sm font-medium leading-6 text-gray-900">
                         Popular Filters
                       </label>
-                      <Switch
-                        checked={values.furnished}
-                        onChange={() =>
-                          setFieldValue('furnished', !values.furnished)
+                      <FilterToggle
+                        label="Furnished"
+                        checked={values.furnished ?? false}
+                        onChange={(checked) =>
+                          setFieldValue('furnished', checked)
                         }
-                        className={`mt-2 flex items-center rounded-full px-4 py-2 ${
-                          values.furnished
-                            ? 'bg-primary text-white'
-                            : 'bg-gray-200 text-gray-700'
-                        }`}
-                      >
-                        {values.furnished ? (
-                          <CheckIcon className="h-5 w-5" />
-                        ) : (
-                          <XMarkIcon className="h-5 w-5" />
-                        )}
-                        <span className="ml-2">Furnished</span>
-                      </Switch>
+                        className="mt-2"
+                      />
                     </div>
 
-                    {/* Pet Friendly Toggle */}
                     <div className="flex items-center sm:col-span-1">
-                      <Switch
-                        checked={values.pets}
-                        onChange={() => setFieldValue('pets', !values.pets)}
-                        className={`flex items-center rounded-full px-4 py-2 md:mt-8 ${
-                          values.pets
-                            ? 'bg-primary text-white'
-                            : 'bg-gray-200 text-gray-700'
-                        }`}
-                      >
-                        {values.pets ? (
-                          <CheckIcon className="h-5 w-5" />
-                        ) : (
-                          <XMarkIcon className="h-5 w-5" />
-                        )}
-                        <span className="ml-2">Pets</span>
-                      </Switch>
+                      <FilterToggle
+                        label="Pets"
+                        checked={values.pets ?? false}
+                        onChange={(checked) => setFieldValue('pets', checked)}
+                        className="md:mt-8"
+                      />
                     </div>
                   </>
                 </div>

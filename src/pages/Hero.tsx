@@ -1,3 +1,5 @@
+import { Link } from 'react-router-dom';
+
 export default function Hero() {
   return (
     <div className="mx-auto max-w-2xl py-24 sm:py-48">
@@ -20,18 +22,18 @@ export default function Hero() {
           looking for.
         </p>
         <div className="mt-10 flex items-center justify-center gap-x-6">
-          <a
-            href="/signup"
+          <Link
+            to="/signup"
             className="rounded-md bg-primary px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-secondary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
           >
             Join Us
-          </a>
-          <a
-            href="/about"
+          </Link>
+          <Link
+            to="/about"
             className="text-sm font-semibold leading-6 text-gray-900"
           >
             Learn more <span aria-hidden="true">→</span>
-          </a>
+          </Link>
         </div>
       </div>
     </div>
