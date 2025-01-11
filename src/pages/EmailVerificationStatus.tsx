@@ -80,7 +80,7 @@ export const EmailVerificationStatus = () => {
   }
 
   return (
-    <div className="mx-auto mt-20 max-w-md rounded-lg bg-yellow-50 p-8 shadow-lg">
+    <div className="mx-auto mt-20 max-w-lg rounded-lg bg-yellow-50 p-8 shadow-lg">
       <h2 className="mb-4 text-2xl font-bold text-yellow-700">
         Please Verify Your Email
       </h2>
