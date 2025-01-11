@@ -272,6 +272,57 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     [currentUser, refreshUserData],
   );
 
+  // TODO: I am not sure where I was going with it
+  // INVESTIGATE if ther is a use to putting unsbubscirbe behavior in account preferences
+  // const updateEmailPreferences = useCallback(
+  //   async (isSubscribed: boolean) => {
+  //     if (!currentUser) throw new Error('User not logged in');
+
+  //     try {
+  //       const authToken = await currentUser.getIdToken();
+  //       isSubscribed ? resubscribe(authToken) : unsubscribe();
+  //       await refreshUserData();
+  //     } catch (error) {
+  //       console.error('Error updating email preferences:', error);
+  //       throw error;
+  //     }
+  //   },
+  //   [currentUser, refreshUserData],
+  // );
+
+  // TODO: confirm this function
+  // const deleteAccount = useCallback(async () => {
+  //   if (!currentUser) throw new Error('User not logged in');
+
+  //   try {
+  //     const token = await currentUser.getIdToken();
+
+  //     // Delete user data from your backend
+  //     const response = await fetch('/api/delete-account', {
+  //       method: 'DELETE',
+  //       headers: {
+  //         Authorization: `Bearer ${token}`,
+  //       },
+  //     });
+
+  //     if (!response.ok) {
+  //       throw new Error('Failed to delete account data');
+  //     }
+
+  //     // Delete Firebase account
+  //     await currentUser.delete();
+
+  //     // Clear local data
+  //     clearUserData();
+
+  //     // Navigate to home
+  //     navigate('/');
+  //   } catch (error) {
+  //     console.error('Error deleting account:', error);
+  //     throw error;
+  //   }
+  // }, [currentUser, clearUserData, navigate]);
+
   // Only render children once auth is ready
   if (!isAuthReady) {
     return <LoadingSpinner />;

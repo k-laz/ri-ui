@@ -45,7 +45,7 @@ export default function About() {
       id: 'team',
       title: 'Our Team',
       content:
-        'We are a passionate group of students and professionals committed to making renting easier to navigate. Our team leverages technology and firsthand experiences to create a service that understands students needs.',
+        'We are a passionate group of students and professionals committed to making renting easier to navigate. Our team leverages technology and firsthand experiences to create a service that understands peoples needs.',
       variant: 'regular',
       icon: '👥',
     },
@@ -87,7 +87,7 @@ export default function About() {
     <div className="mx-auto max-w-3xl px-6 py-16">
       <div>{sections.map(renderSection)}</div>
 
-      <section className="mt-20 text-center">
+      <section className="mt-10 text-center">
         <h2 className="text-2xl font-semibold text-gray-900">
           Ready to Find Your Perfect Home?
         </h2>

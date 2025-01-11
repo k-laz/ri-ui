@@ -10,6 +10,7 @@ import LoadingSpinner from './LoadingSpinner';
 import { useUserStore } from '@/hooks/useUser';
 import PriceRangeSelector from './form/PriceRangeSelector';
 import FilterToggle from './form/FilterToggle';
+import { InformationCircleIcon } from '@heroicons/react/24/solid';
 
 const validationSchema = Yup.object({
   min_price: Yup.number().min(0, 'Minimum price cannot be less than 0'),
@@ -98,6 +99,11 @@ const Filter = () => {
         isVisible={alert.show}
         onClose={hideAlert}
       />
+      {/* Floating info message */}
+      <div className="fixed bottom-4 right-4 z-10 flex max-w-[240px] items-center gap-2 rounded-lg border border-gray-100 bg-white p-3 text-xs text-gray-800 shadow-sm">
+        <InformationCircleIcon className="h-4 w-4 flex-shrink-0 text-yellow-400" />
+        <p>Only selected filters will limit your results</p>
+      </div>
       <Formik
         initialValues={initialValues}
         validationSchema={validationSchema}
@@ -105,172 +111,168 @@ const Filter = () => {
         onSubmit={handleSubmit}
       >
         {({ values, setFieldValue }) => (
-          <div className="mt-4 lg:mt-8">
-            <Form className="mx-auto w-full max-w-5xl rounded-lg md:p-10">
-              <div className="border-b border-gray-900/10 p-3 lg:mx-10">
-                {/* <div className="w-full max-w-2xl justify-center">
+          <Form className="mx-auto w-full max-w-5xl rounded-lg">
+            <div className="border-b border-gray-900/10 p-3 lg:mx-10">
+              {/* <div className="w-full max-w-2xl justify-center">
                     <PriceRangeSlider
                       min_price={values.min_price}
                       max_price={values.max_price}
                       setFieldValue={setFieldValue}
                     />
                   </div> */}
-                <div className="relative mt-10 grid grid-cols-1 gap-x-6 gap-y-4 sm:grid-cols-10 sm:gap-y-8 md:gap-x-16 lg:mb-4">
-                  <>
-                    <PriceRangeSelector
-                      min_price={values.min_price}
-                      max_price={values.max_price}
-                      setFieldValue={setFieldValue}
-                    />
-                    {/* Move-In Date */}
-                    <div className="sm:col-span-5">
-                      <label
-                        htmlFor="move_in_date"
-                        className="block text-sm font-medium leading-6 text-gray-900"
-                      >
-                        Move-In Date
-                      </label>
-                      <div className="mt-2">
-                        <Field
-                          id="move_in_date"
-                          name="move_in_date"
-                          type="date"
-                          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                          value={
-                            values.move_in_date
-                              ? new Date(values.move_in_date)
-                                  .toISOString()
-                                  .split('T')[0]
-                              : ''
-                          }
-                          onChange={(
-                            e: React.ChangeEvent<HTMLInputElement>,
-                          ) => {
-                            const date = e.target.value
-                              ? new Date(e.target.value)
-                              : null;
-                            setFieldValue(
-                              'move_in_date',
-                              date ? date.toISOString() : '',
-                            );
-                          }}
-                        />
-                        <ErrorMessage
-                          name="move_in_date"
-                          component="div"
-                          className="mt-1 text-sm text-red-600"
-                        />
-                      </div>
-                    </div>
-
-                    {/* Length of Stay */}
-                    <div className="sm:col-span-5">
-                      <label
-                        htmlFor="length_of_stay"
-                        className="block text-sm font-medium leading-6 text-gray-900"
-                      >
-                        Length of Stay
-                      </label>
-                      <div className="mt-2">
-                        <Field
-                          id="length_of_stay"
-                          name="length_of_stay"
-                          as="select"
-                          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                        >
-                          <option value="">Select...</option>
-                          <option value="4">4 months</option>
-                          <option value="8">8 months</option>
-                          <option value="12">12 months</option>
-                          <option value="any">Any</option>
-                        </Field>
-                      </div>
-                    </div>
-
-                    {/* Gender Preference */}
-                    <div className="sm:col-span-5">
-                      <label
-                        htmlFor="gender_preference"
-                        className="block text-sm font-medium leading-6 text-gray-900"
-                      >
-                        Gender Preference
-                      </label>
-                      <div className="mt-2">
-                        <Field
-                          id="gender_preference"
-                          name="gender_preference"
-                          as="select"
-                          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                        >
-                          <option value="">Select...</option>
-                          <option value="male">Male</option>
-                          <option value="female">Female</option>
-                          <option value="any">Any</option>
-                        </Field>
-                        <ErrorMessage
-                          name="gender_preference"
-                          component="div"
-                          className="mt-1 text-sm text-red-600"
-                        />
-                      </div>
-                    </div>
-
-                    <NumberSelector
-                      name="num_baths"
-                      label="Number of Bathrooms"
-                      values={values.num_baths ?? []}
-                      setFieldValue={setFieldValue}
-                    />
-
-                    <NumberSelector
-                      name="num_beds"
-                      label="Number of Bedrooms"
-                      values={values.num_beds ?? []}
-                      setFieldValue={setFieldValue}
-                    />
-
-                    <NumberSelector
-                      name="num_parking"
-                      label="Number of Parking Spots"
-                      values={values.num_parking ?? []}
-                      setFieldValue={setFieldValue}
-                    />
-
-                    <hr className="md:hidden"></hr>
-
-                    <div className="sm:col-span-2">
-                      <label className="block text-sm font-medium leading-6 text-gray-900">
-                        Popular Filters
-                      </label>
-                      <FilterToggle
-                        label="Furnished"
-                        checked={values.furnished ?? false}
-                        onChange={(checked) =>
-                          setFieldValue('furnished', checked)
+              <div className="relative mt-10 grid grid-cols-1 gap-x-6 gap-y-4 sm:grid-cols-10 sm:gap-y-8 md:gap-x-16 lg:mb-4">
+                <>
+                  <PriceRangeSelector
+                    min_price={values.min_price}
+                    max_price={values.max_price}
+                    setFieldValue={setFieldValue}
+                  />
+                  {/* Move-In Date */}
+                  <div className="sm:col-span-5">
+                    <label
+                      htmlFor="move_in_date"
+                      className="block text-sm font-medium leading-6 text-gray-900"
+                    >
+                      Move-In Date
+                    </label>
+                    <div className="mt-2">
+                      <Field
+                        id="move_in_date"
+                        name="move_in_date"
+                        type="date"
+                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                        value={
+                          values.move_in_date
+                            ? new Date(values.move_in_date)
+                                .toISOString()
+                                .split('T')[0]
+                            : ''
                         }
-                        className="mt-2"
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                          const date = e.target.value
+                            ? new Date(e.target.value)
+                            : null;
+                          setFieldValue(
+                            'move_in_date',
+                            date ? date.toISOString() : '',
+                          );
+                        }}
+                      />
+                      <ErrorMessage
+                        name="move_in_date"
+                        component="div"
+                        className="mt-1 text-sm text-red-600"
                       />
                     </div>
+                  </div>
 
-                    <div className="flex items-center sm:col-span-1">
-                      <FilterToggle
-                        label="Pets"
-                        checked={values.pets ?? false}
-                        onChange={(checked) => setFieldValue('pets', checked)}
-                        className="md:mt-8"
+                  {/* Length of Stay */}
+                  <div className="sm:col-span-5">
+                    <label
+                      htmlFor="length_of_stay"
+                      className="block text-sm font-medium leading-6 text-gray-900"
+                    >
+                      Length of Stay
+                    </label>
+                    <div className="mt-2">
+                      <Field
+                        id="length_of_stay"
+                        name="length_of_stay"
+                        as="select"
+                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                      >
+                        <option value="">Select...</option>
+                        <option value="4">4 months</option>
+                        <option value="8">8 months</option>
+                        <option value="12">12 months</option>
+                        <option value="any">Any</option>
+                      </Field>
+                    </div>
+                  </div>
+
+                  {/* Gender Preference */}
+                  <div className="sm:col-span-5">
+                    <label
+                      htmlFor="gender_preference"
+                      className="block text-sm font-medium leading-6 text-gray-900"
+                    >
+                      Gender Preference
+                    </label>
+                    <div className="mt-2">
+                      <Field
+                        id="gender_preference"
+                        name="gender_preference"
+                        as="select"
+                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                      >
+                        <option value="">Select...</option>
+                        <option value="male">Male</option>
+                        <option value="female">Female</option>
+                        <option value="any">Any</option>
+                      </Field>
+                      <ErrorMessage
+                        name="gender_preference"
+                        component="div"
+                        className="mt-1 text-sm text-red-600"
                       />
                     </div>
-                  </>
-                </div>
+                  </div>
+
+                  <NumberSelector
+                    name="num_baths"
+                    label="Number of Bathrooms"
+                    values={values.num_baths ?? []}
+                    setFieldValue={setFieldValue}
+                  />
+
+                  <NumberSelector
+                    name="num_beds"
+                    label="Number of Bedrooms"
+                    values={values.num_beds ?? []}
+                    setFieldValue={setFieldValue}
+                  />
+
+                  <NumberSelector
+                    name="num_parking"
+                    label="Number of Parking Spots"
+                    values={values.num_parking ?? []}
+                    setFieldValue={setFieldValue}
+                  />
+
+                  <hr className="md:hidden"></hr>
+
+                  <div className="sm:col-span-2">
+                    <label className="block text-sm font-medium leading-6 text-gray-900">
+                      Popular Filters
+                    </label>
+                    <FilterToggle
+                      label="Furnished"
+                      checked={values.furnished ?? false}
+                      onChange={(checked) =>
+                        setFieldValue('furnished', checked)
+                      }
+                      className="mt-2"
+                    />
+                  </div>
+
+                  <div className="flex items-center sm:col-span-1">
+                    <FilterToggle
+                      label="Pets"
+                      checked={values.pets ?? false}
+                      onChange={(checked) => setFieldValue('pets', checked)}
+                      className="md:mt-8"
+                    />
+                  </div>
+                </>
               </div>
-              <button
-                type="submit"
-                className="my-4 w-full rounded bg-primary py-2 text-white hover:bg-secondary lg:my-8"
-              >
-                Update
-              </button>
-            </Form>
-          </div>
+            </div>
+            <button
+              type="submit"
+              className="my-4 w-full rounded bg-primary py-2 text-white hover:bg-secondary lg:my-8"
+            >
+              Update
+            </button>
+          </Form>
         )}
       </Formik>
     </div>

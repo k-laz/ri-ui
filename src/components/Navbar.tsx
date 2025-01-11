@@ -15,7 +15,7 @@ const Navbar = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   // print user token for DEV
-  currentUser?.getIdToken().then((data) => console.log(data));
+  // currentUser?.getIdToken().then((data) => console.log(data));
 
   return (
     <header className="absolute inset-x-0 top-0 z-50">

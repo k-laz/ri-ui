@@ -96,7 +96,7 @@ export default function FAQ() {
       question: 'Can I suggest a feature or report a bug?',
       answer: (
         <div>
-          Absolutely! We're always looking to improve. You can suggest features
+          Absolutely! We are always looking to improve. You can suggest features
           or report bugs by contacting our support team at
           <a
             href="mailto:klazarevdev@gmail.com"
@@ -123,7 +123,7 @@ export default function FAQ() {
                 onClick={() => toggleSection(id)}
                 className="flex w-full items-center text-left"
               >
-                <Icon className="flex-shrink-0 text-2xl text-teal-600" />
+                <Icon />
                 <span className="ml-4 text-xl font-medium text-gray-900">
                   {question}
                 </span>

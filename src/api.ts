@@ -17,7 +17,6 @@ export const resendVerificationEmail = async (email: string): Promise<void> => {
     if (!response.ok) {
       throw new Error('Failed to sync user with backend.');
     }
-    console.log('User successfully synced with backend.');
   } catch (error) {
     console.error('Error syncing user with backend:', error);
     throw error;
@@ -42,7 +41,6 @@ export const createOrSyncUserWithBackend = async (
     if (!response.ok) {
       throw new Error('Failed to sync user with backend.');
     }
-    console.log('User successfully synced with backend.');
   } catch (error) {
     console.error('Error syncing user with backend:', error);
     throw error;
@@ -126,14 +124,40 @@ export const deleteUserProfile = async () => {
   }
 };
 
-export const unsubscribe = async (token: string) => {
+export const unsubscribe = async (unsubscribeToken: string) => {
   const response = await fetch(`${API_URL}/users/unsubscribe`, {
     method: 'PATCH',
-    body: JSON.stringify({ token }),
+    body: JSON.stringify({ unsubscribeToken }),
   });
 
   if (!response.ok) {
     throw new Error('Failed to update user profile');
   }
   return response.json();
+};
+
+export const resubscribe = async (token: string) => {
+  const response = await fetch(`${API_URL}/users/resubscribe`, {
+    method: 'PATCH',
+    headers: {
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to update user profile');
+  }
+  return response.json();
+};
+
+export const verifyEmail = async (token: string) => {
+  const response = await fetch(`${API_URL}/auth/verify-email?token=${token}`, {
+    method: 'POST',
+  });
+  if (!response.ok) {
+    throw new Error('Failed to verify email');
+    return false;
+  }
+  return true;
 };
