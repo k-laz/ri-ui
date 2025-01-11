@@ -1,7 +1,7 @@
 // Dashboard.tsx
 import { useState } from 'react';
 import Filter from '../components/Filter';
-import Account from '../components/Account';
+// import Account from '../components/Account';
 
 const Dashboard = () => {
   const [activeTab, setActiveTab] = useState<'filter' | 'account'>('filter');
@@ -36,7 +36,8 @@ const Dashboard = () => {
   return (
     <div className="mx-auto max-w-5xl px-4 py-8">
       <Breadcrumb />
-      {activeTab === 'filter' ? <Filter /> : <Account />}
+      <Filter />
+      {/* {activeTab === 'filter' ? <Filter /> : <Account />} */}
     </div>
   );
 };
