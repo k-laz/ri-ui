@@ -6,7 +6,7 @@ import { useAuth } from '@/hooks/AuthProvider';
 
 const navigation = [
   { name: 'Dashboard', href: '/dashboard' },
-  { name: 'FAQ', href: '/faq' },
+  // { name: 'FAQ', href: '/faq' },
   { name: 'About', href: '/about' },
 ];
 
