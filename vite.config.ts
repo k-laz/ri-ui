@@ -4,7 +4,7 @@ import react from '@vitejs/plugin-react-swc';
 import path from 'path';
 
 export default defineConfig({
-  base: './',
+  base: '/', // Change from './' to '/'
   build: {
     manifest: true,
     rollupOptions: {
