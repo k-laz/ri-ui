@@ -14,16 +14,12 @@ const PriceRangeSelector: React.FC<PriceRangeSelectorProps> = ({
 }) => {
   const handleMinPriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value === '' ? undefined : Number(e.target.value);
-    if (value === undefined || !max_price || value <= max_price) {
-      setFieldValue('min_price', value);
-    }
+    setFieldValue('min_price', value);
   };
 
   const handleMaxPriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value === '' ? undefined : Number(e.target.value);
-    if (value === undefined || !min_price || value >= min_price) {
-      setFieldValue('max_price', value);
-    }
+    setFieldValue('max_price', value);
   };
 
   return (
