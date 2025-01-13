@@ -10,7 +10,7 @@ import LoadingSpinner from './LoadingSpinner';
 import { useUserStore } from '@/hooks/useUser';
 import PriceRangeSelector from './form/PriceRangeSelector';
 import FilterToggle from './form/FilterToggle';
-import { InformationCircleIcon } from '@heroicons/react/24/solid';
+import FloatingMessage from './ui/floating_message';
 
 const validationSchema = Yup.object({
   min_price: Yup.number().min(0, 'Minimum price cannot be less than 0'),
@@ -99,11 +99,7 @@ const Filter = () => {
         isVisible={alert.show}
         onClose={hideAlert}
       />
-      {/* Floating info message */}
-      <div className="fixed bottom-4 right-4 z-10 flex max-w-[240px] items-center gap-2 rounded-lg border border-gray-100 bg-white p-3 text-xs text-gray-800 shadow-sm">
-        <InformationCircleIcon className="h-4 w-4 flex-shrink-0 text-yellow-400" />
-        <p>Only selected filters will limit your results</p>
-      </div>
+      <FloatingMessage text="Only selected filters will limit your results" />
       <Formik
         initialValues={initialValues}
         validationSchema={validationSchema}
