@@ -45,7 +45,8 @@ interface AuthContextType {
   notificationTitle: unknown;
   setNotificationTitle: unknown;
   isAuthReady: boolean;
-
+  isFirstTimeUser: boolean;
+  setIsFirstTimeUser: (value: boolean) => void;
   refreshUserData: DebouncedFunc<() => Promise<void>>;
 }
 
@@ -91,6 +92,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const [notificationModalOpen, setNotificationModalOpen] = useState(false);
   const [notificationTitle, setNotificationTitle] = useState('');
   const [isAuthReady, setIsAuthReady] = useState(false);
+  const [isFirstTimeUser, setIsFirstTimeUser] = useState(false);
 
   const refreshUserData = useCallback(async () => {
     if (!currentUser) return;
@@ -220,6 +222,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       );
       const firebaseUId = userCredential.user.uid;
       await createUserProfile(firebaseUId, email);
+      setIsFirstTimeUser(true);
 
       navigate('/dashboard');
     } catch (error: unknown) {
@@ -340,6 +343,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     sendPasswordResetEmail,
     isAuthReady,
     refreshUserData: debouncedRefresh,
+    isFirstTimeUser,
+    setIsFirstTimeUser,
 
     notificationTitle,
     setNotificationTitle,
