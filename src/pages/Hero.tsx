@@ -1,3 +1,4 @@
+import MapboxExample from '@/components/form/TestMap';
 import { Link } from 'react-router-dom';
 
 export default function Hero() {
@@ -36,6 +37,8 @@ export default function Hero() {
           </Link>
         </div>
       </div>
+
+      <MapboxExample />
     </div>
   );
 }

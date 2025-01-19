@@ -161,3 +161,17 @@ export const verifyEmail = async (token: string) => {
   }
   return true;
 };
+
+export const getListings = async (token: string) => {
+  const response = await fetch(`${API_URL}/users/me/listings`, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    },
+  });
+  if (!response.ok) {
+    throw new Error('Failed to verify email');
+  }
+  return response.json();
+};

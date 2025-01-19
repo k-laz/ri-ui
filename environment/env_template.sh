@@ -15,3 +15,4 @@ export FIREBASE_STORAGE_BUCKET="<firebase_storage_bucket>"
 export FIREBASE_MESSAGING_SENDER_ID="<firebase_messaging_sender_id>"
 export FIREBASE_APP_ID="<firebase_app_id>"
 export FIREBASE_MEASUREMENT_ID="<firebase_measurement_id>"
+export MAPBOX_TOKEN

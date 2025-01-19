@@ -11,6 +11,7 @@ import { useUserStore } from '@/hooks/useUser';
 import PriceRangeSelector from './form/PriceRangeSelector';
 import FilterToggle from './form/FilterToggle';
 import FloatingMessage from './ui/floating_message';
+import Map from './form/Map';
 
 const validationSchema = Yup.object({
   min_price: Yup.number().min(0, 'Minimum price cannot be less than 0'),
@@ -50,6 +51,17 @@ const Filter = () => {
     type: 'success',
   });
 
+  const initialLocation = {
+    latitude: 40.7128,
+    longitude: -74.006,
+    radius: 5,
+  };
+
+  const handleLocationSelect = (location) => {
+    console.log('Selected location:', location);
+    // {latitude: number, longitude: number, radius: number}
+  };
+
   const showAlert = (message: string, type: AlertType = 'success'): void => {
     setAlert({ show: true, message, type });
   };
@@ -67,8 +79,8 @@ const Filter = () => {
 
   const initialValues = {
     //Partial<UserFilter>
-    min_price: filter?.min_price ?? 0,
-    max_price: filter?.max_price ?? 5000,
+    min_price: filter?.min_price ?? undefined,
+    max_price: filter?.max_price ?? undefined,
     move_in_date: filter?.move_in_date ?? undefined,
     length_of_stay: filter?.length_of_stay ?? undefined,
     num_baths: filter?.num_baths ?? [],
@@ -100,6 +112,7 @@ const Filter = () => {
         onClose={hideAlert}
       />
       <FloatingMessage text="Only selected filters will limit your results" />
+
       <Formik
         initialValues={initialValues}
         validationSchema={validationSchema}
@@ -116,8 +129,13 @@ const Filter = () => {
                       setFieldValue={setFieldValue}
                     />
                   </div> */}
+
               <div className="relative mt-10 grid grid-cols-1 gap-x-6 gap-y-4 sm:grid-cols-10 sm:gap-y-8 md:gap-x-16 lg:mb-4">
                 <>
+                  <Map
+                    onLocationSelect={handleLocationSelect}
+                    initialLocation={initialLocation}
+                  />
                   <PriceRangeSelector
                     min_price={values.min_price}
                     max_price={values.max_price}
@@ -180,7 +198,7 @@ const Filter = () => {
                         <option value="">Select...</option>
                         <option value="4">4 months</option>
                         <option value="8">8 months</option>
-                        <option value="12">12 months</option>
+                        <option value="12">12+ months</option>
                         <option value="any">Any</option>
                       </Field>
                     </div>

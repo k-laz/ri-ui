@@ -7,6 +7,7 @@ export type UserData = {
   verificationTokenExpires: Date;
   filter: UserFilter;
   isSubscribed: boolean;
+  listings: Listing[];
 };
 
 // Define the AuthContextType with the User type

@@ -33,6 +33,7 @@ declare -a env_var_list=(
     "FIREBASE_MESSAGING_SENDER_ID"  # Firebase config
     "FIREBASE_APP_ID"               # Firebase config
     "FIREBASE_MEASUREMENT_ID"       # Firebase config
+    "MAPBOX_TOKEN"
 )
 
 # Loops through all specified env 

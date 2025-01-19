@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import Filter from '../components/Filter';
 import WelcomeModal from '@/components/WelcomeModal';
 import { useAuth } from '@/hooks/AuthProvider';
+import Listings from '@/components/Listings';
 // import Account from '../components/Account';
 
 const Dashboard = () => {
@@ -91,7 +92,7 @@ const Dashboard = () => {
       case 'filter':
         return <Filter />;
       case 'listings':
-        return <div>Listings Content</div>;
+        return <Listings />;
       // case 'account':
       //   return <Account />;
       default:
