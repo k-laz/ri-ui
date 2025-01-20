@@ -10,9 +10,8 @@ import {
 } from '@/components/ui/dialog';
 import { Slider } from '@/components/ui/slider';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { MapIcon, Minus, Plus, Search, Loader2 } from 'lucide-react';
-import { GeoJSONFeature } from 'mapbox-gl';
+import { MapIcon, Minus, Plus } from 'lucide-react';
+import type { Feature, Polygon } from 'geojson';
 
 // Ensure token is properly loaded from environment variables
 if (!import.meta.env.VITE_MAPBOX_TOKEN) {
@@ -32,25 +31,18 @@ interface MapComponentProps {
   initialLocation?: Location;
 }
 
-interface GeocodingResult {
-  place_name: string;
-  center: [number, number];
-}
-
 const MapComponent: React.FC<MapComponentProps> = ({
   onLocationSelect,
   initialLocation,
 }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [searchResults, setSearchResults] = useState<GeocodingResult[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [location, setLocation] = useState<Location>(
     initialLocation || {
-      latitude: 40.7128,
-      longitude: -74.006,
-      radius: 5,
+      // Vancouver coordinates
+      latitude: 49.2827,
+      longitude: -123.1207,
+      radius: 2,
     },
   );
 
@@ -58,7 +50,6 @@ const MapComponent: React.FC<MapComponentProps> = ({
   const map = useRef<Map | null>(null);
   const circle = useRef<GeoJSONSource | null>(null);
   const marker = useRef<Marker | null>(null);
-  const searchTimeout = useRef<NodeJS.Timeout>();
 
   const initializeMap = () => {
     if (!mapContainer.current || map.current) return;
@@ -68,7 +59,7 @@ const MapComponent: React.FC<MapComponentProps> = ({
         container: mapContainer.current,
         style: 'mapbox://styles/mapbox/streets-v12',
         center: [location.longitude, location.latitude],
-        zoom: 12,
+        zoom: 10,
       });
 
       map.current.on('load', () => {
@@ -97,7 +88,7 @@ const MapComponent: React.FC<MapComponentProps> = ({
 
     map.current.addSource('circle', {
       type: 'geojson',
-      data: circleData as GeoJSONFeature,
+      data: circleData,
     });
 
     map.current.addLayer({
@@ -134,7 +125,6 @@ const MapComponent: React.FC<MapComponentProps> = ({
       const lngLat = marker.current?.getLngLat();
       if (lngLat) {
         updateLocation(lngLat.lat, lngLat.lng, location.radius);
-        reverseGeocode(lngLat.lat, lngLat.lng);
       }
     });
   };
@@ -142,7 +132,7 @@ const MapComponent: React.FC<MapComponentProps> = ({
   const createGeoJSONCircle = (
     center: [number, number],
     radiusKm: number,
-  ): GeoJSONFeature => {
+  ): Feature<Polygon> => {
     const points = 64;
     const coords: number[][] = [];
 
@@ -176,7 +166,7 @@ const MapComponent: React.FC<MapComponentProps> = ({
     }));
 
     if (circle.current) {
-      circle.current.setData(createGeoJSONCircle([lng, lat], rad) as any);
+      circle.current.setData(createGeoJSONCircle([lng, lat], rad));
     }
 
     if (map.current) {
@@ -186,149 +176,60 @@ const MapComponent: React.FC<MapComponentProps> = ({
     onLocationSelect({ latitude: lat, longitude: lng, radius: rad });
   };
 
-  const handleSearch = async () => {
-    if (!searchQuery.trim()) return;
-
-    setIsLoading(true);
-    setError(null);
-
-    try {
-      const response = await fetch(
-        `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(
-          searchQuery,
-        )}.json?access_token=${mapboxgl.accessToken}&limit=5`,
-      );
-
-      if (!response.ok) throw new Error('Search failed');
-
-      const data = await response.json();
-      setSearchResults(
-        data.features.map((f: any) => ({
-          place_name: f.place_name,
-          center: f.center,
-        })),
-      );
-    } catch (err) {
-      setError('Search failed. Please try again.');
-      console.error('Search error:', err);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const reverseGeocode = async (lat: number, lng: number) => {
-    try {
-      const response = await fetch(
-        `https://api.mapbox.com/geocoding/v5/mapbox.places/${lng},${lat}.json?access_token=${mapboxgl.accessToken}`,
-      );
-
-      if (!response.ok) throw new Error('Reverse geocoding failed');
-
-      const data = await response.json();
-      if (data.features?.length > 0) {
-        setLocation((prev) => ({
-          ...prev,
-          address: data.features[0].place_name,
-        }));
-      }
-    } catch (err) {
-      console.error('Reverse geocoding error:', err);
-    }
-  };
-
   useEffect(() => {
     if (isModalOpen) {
-      initializeMap();
+      // Small delay to ensure container is ready
+      const timer = setTimeout(() => {
+        initializeMap();
+      }, 100);
+
+      return () => {
+        clearTimeout(timer);
+        // Clean up map instance and references
+        if (marker.current) {
+          marker.current.remove();
+          marker.current = null;
+        }
+        if (map.current) {
+          map.current.remove();
+          map.current = null;
+        }
+        // Reset any mapbox-specific body styles that might affect scrolling
+        document.body.style.overflow = '';
+      };
     }
+  }, [isModalOpen]);
 
-    return () => {
-      if (map.current) {
-        map.current.remove();
-        map.current = null;
-      }
-    };
-  }, [initializeMap, isModalOpen]);
-
+  // Force map resize when modal opens
   useEffect(() => {
-    if (searchTimeout.current) {
-      clearTimeout(searchTimeout.current);
-    }
+    if (isModalOpen && map.current) {
+      // Small delay to handle modal transition
+      const timer = setTimeout(() => {
+        map.current?.resize();
+      }, 100);
 
-    if (searchQuery) {
-      searchTimeout.current = setTimeout(handleSearch, 500);
-    } else {
-      setSearchResults([]);
+      return () => clearTimeout(timer);
     }
-
-    return () => {
-      if (searchTimeout.current) {
-        clearTimeout(searchTimeout.current);
-      }
-    };
-  }, [handleSearch, searchQuery]);
+  }, [isModalOpen]);
 
   return (
     <>
       <Button
         type="button"
         onClick={() => setIsModalOpen(true)}
-        className="flex items-center gap-2"
+        className="flex items-center gap-2 bg-primary hover:bg-secondary"
       >
         <MapIcon className="h-5 w-5" />
         Select Location
-        {location.address && (
-          <span className="ml-2 text-sm text-gray-600">
-            ({location.address.split(',')[0]})
-          </span>
-        )}
       </Button>
 
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
         <DialogContent className="sm:max-w-[800px]">
           <DialogHeader>
-            <DialogTitle>Select Location and Radius</DialogTitle>
+            <DialogTitle>Move marker to select Location and Radius</DialogTitle>
           </DialogHeader>
 
           <div className="grid gap-4">
-            <div className="relative">
-              <div className="relative">
-                <Input
-                  type="text"
-                  placeholder="Search for a location..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pr-10"
-                />
-                {isLoading ? (
-                  <Loader2 className="absolute right-3 top-2.5 h-5 w-5 animate-spin text-gray-400" />
-                ) : (
-                  <Search className="absolute right-3 top-2.5 h-5 w-5 text-gray-400" />
-                )}
-              </div>
-
-              {searchResults.length > 0 && (
-                <div className="absolute z-10 mt-1 w-full rounded-md border border-gray-200 bg-white shadow-lg">
-                  {searchResults.map((result, index) => (
-                    <button
-                      key={index}
-                      className="w-full px-4 py-2 text-left text-sm hover:bg-gray-100 focus:bg-gray-100 focus:outline-none"
-                      onClick={() => {
-                        updateLocation(
-                          result.center[1],
-                          result.center[0],
-                          location.radius,
-                        );
-                        setSearchQuery('');
-                        setSearchResults([]);
-                      }}
-                    >
-                      {result.place_name}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
-
             <div ref={mapContainer} className="h-[400px] w-full rounded-lg" />
 
             <div className="flex items-center gap-4 px-4">
@@ -343,7 +244,7 @@ const MapComponent: React.FC<MapComponentProps> = ({
                   );
                 }}
                 min={1}
-                max={50}
+                max={30}
                 step={1}
                 className="flex-1"
               />

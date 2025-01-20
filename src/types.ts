@@ -18,9 +18,16 @@ export type AuthContextType = {
   token: string;
 };
 
+export interface Location {
+  latitude: number;
+  longitude: number;
+  radius: number;
+}
+
 export type UserFilter = {
   id: number;
   userid: number;
+  location: Location;
   max_price: number;
   min_price: number;
   move_in_date: Date;

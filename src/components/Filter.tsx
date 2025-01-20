@@ -1,5 +1,5 @@
 import { useAuth } from '@/hooks/AuthProvider';
-import { UserFilter } from '@/types';
+import { Location, UserFilter } from '@/types';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 
@@ -51,15 +51,8 @@ const Filter = () => {
     type: 'success',
   });
 
-  const initialLocation = {
-    latitude: 40.7128,
-    longitude: -74.006,
-    radius: 5,
-  };
-
-  const handleLocationSelect = (location) => {
-    console.log('Selected location:', location);
-    // {latitude: number, longitude: number, radius: number}
+  const handleLocationSelect = (location: Location) => {
+    console.log('Selected location:', location); // {latitude: number, longitude: number, radius: number}
   };
 
   const showAlert = (message: string, type: AlertType = 'success'): void => {
@@ -79,6 +72,7 @@ const Filter = () => {
 
   const initialValues = {
     //Partial<UserFilter>
+    location: filter?.location ?? undefined,
     min_price: filter?.min_price ?? undefined,
     max_price: filter?.max_price ?? undefined,
     move_in_date: filter?.move_in_date ?? undefined,
@@ -122,20 +116,12 @@ const Filter = () => {
         {({ values, setFieldValue }) => (
           <Form className="mx-auto w-full max-w-5xl rounded-lg">
             <div className="border-b border-gray-900/10 p-3 lg:mx-10">
-              {/* <div className="w-full max-w-2xl justify-center">
-                    <PriceRangeSlider
-                      min_price={values.min_price}
-                      max_price={values.max_price}
-                      setFieldValue={setFieldValue}
-                    />
-                  </div> */}
-
+              {/* <Map
+                onLocationSelect={handleLocationSelect}
+                initialLocation={values.location}
+              /> */}
               <div className="relative mt-10 grid grid-cols-1 gap-x-6 gap-y-4 sm:grid-cols-10 sm:gap-y-8 md:gap-x-16 lg:mb-4">
                 <>
-                  <Map
-                    onLocationSelect={handleLocationSelect}
-                    initialLocation={initialLocation}
-                  />
                   <PriceRangeSelector
                     min_price={values.min_price}
                     max_price={values.max_price}

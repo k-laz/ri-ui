@@ -96,7 +96,7 @@ export default function About() {
         </p>
         <Link
           to="/signup"
-          className="mt-8 inline-block rounded bg-teal-600 px-8 py-3 text-lg font-medium text-white"
+          className="mt-8 inline-block rounded bg-primary px-8 py-3 text-lg font-medium text-white hover:bg-secondary"
         >
           Get Started
         </Link>
