@@ -1,5 +1,5 @@
 import { useAuth } from '@/hooks/AuthProvider';
-import { Location, UserFilter } from '@/types';
+import { UserFilter } from '@/types';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 
@@ -11,7 +11,7 @@ import { useUserStore } from '@/hooks/useUser';
 import PriceRangeSelector from './form/PriceRangeSelector';
 import FilterToggle from './form/FilterToggle';
 import FloatingMessage from './ui/floating_message';
-import Map from './form/Map';
+// import Map from './form/Map';
 
 const validationSchema = Yup.object({
   min_price: Yup.number().min(0, 'Minimum price cannot be less than 0'),
@@ -51,9 +51,9 @@ const Filter = () => {
     type: 'success',
   });
 
-  const handleLocationSelect = (location: Location) => {
-    console.log('Selected location:', location); // {latitude: number, longitude: number, radius: number}
-  };
+  // const handleLocationSelect = (location: Location) => {
+  //   console.log('Selected location:', location); // {latitude: number, longitude: number, radius: number}
+  // };
 
   const showAlert = (message: string, type: AlertType = 'success'): void => {
     setAlert({ show: true, message, type });
