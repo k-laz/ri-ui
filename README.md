@@ -1,6 +1,6 @@
 # Rental Insight Frontend
+![Renals Insight Banner](https://github.com/user-attachments/assets/a0dd38af-212e-4b98-bcf1-a5b4ad3d7407)
 
-![Renal Insight Banner]()
 
 ## Description
 
