@@ -74,6 +74,9 @@ export const EmailVerificationStatus = () => {
 
     try {
       setIsResending(true);
+      if (!userData) {
+        throw new Error('User Data failed to load');
+      }
       await resendVerificationEmail(userData.email);
       setMessage('New verification email sent! Please check your inbox.');
 

@@ -12,7 +12,7 @@ const PrivateRoute = () => {
     const loadUserData = async () => {
       if (currentUser && !userData) {
         try {
-          await fetchUserData(currentUser.uid);
+          await fetchUserData(await currentUser.getIdToken());
         } catch (error) {
           console.error('Failed to fetch user data:', error);
         }

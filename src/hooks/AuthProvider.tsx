@@ -23,7 +23,7 @@ import { useNavigate } from 'react-router-dom';
 import {
   createUserProfile,
   updateUserFilter,
-  fetchUserData,
+  apiFetchUserData,
   createOrSyncUserWithBackend,
 } from '../api';
 import { UserFilter } from '../types';
@@ -98,7 +98,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     if (!currentUser) return;
     try {
       const token = await currentUser.getIdToken();
-      const data = await fetchUserData(token);
+      const data = await apiFetchUserData(token);
       setUserData(data);
     } catch (error) {
       console.error('Error refreshing user data:', error);

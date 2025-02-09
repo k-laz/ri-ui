@@ -47,7 +47,7 @@ export const createOrSyncUserWithBackend = async (
   }
 };
 
-export const fetchUserData = async (token: string): Promise<UserData> => {
+export const apiFetchUserData = async (token: string): Promise<UserData> => {
   try {
     const response = await fetch(`${API_URL}/users/me/data`, {
       method: 'GET',

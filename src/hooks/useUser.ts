@@ -1,3 +1,4 @@
+import { apiFetchUserData } from '@/api';
 import { UserData } from '@/types';
 import { create } from 'zustand';
 
@@ -17,13 +18,10 @@ export const useUserStore = create<UserState>((set) => ({
       userData: data,
       lastFetched: data ? Date.now() : null,
     }),
-  fetchUserData: async (uid) => {
+  fetchUserData: async (token) => {
     try {
-      const response = await fetch(`/api/users/${uid}`);
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      const data = await response.json();
+      const data = await apiFetchUserData(token);
+      console.log(data);
       set({
         userData: data,
         lastFetched: Date.now(),
