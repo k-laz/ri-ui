@@ -61,7 +61,7 @@ const Listings = () => {
     );
   }
 
-  if (userData.listings.length === 0) {
+  if (!userData.listings || userData.listings.length === 0) {
     return (
       <div className="mt-12 flex min-h-[200px] items-center justify-center rounded-lg border-2 border-dashed border-gray-200 p-8 text-center">
         <div>
