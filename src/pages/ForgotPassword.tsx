@@ -19,7 +19,6 @@ export default function ForgotPassword() {
     setMessage(null);
 
     try {
-      // Call Firebase's sendPasswordResetEmail function
       await sendPasswordResetEmail(email);
       setMessage('Password reset email has been sent! Check your inbox.');
     } catch (err: unknown) {
@@ -60,7 +59,7 @@ export default function ForgotPassword() {
                 name="email"
                 id="email"
                 className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-primary focus:ring-primary"
-                placeholder="name@company.com"
+                placeholder="your email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
