@@ -4,7 +4,7 @@
 
 ## Description
 
-This is the frontend repository for [rental-insight.com](https://rental-insight.com). This web app is built using ReactJS and initialized using Vite. This app uses TailwindCSS for styling and connects to the [backend](https://github.com/k-laz/ri-api).
+This is the frontend repository for [rentalsinsight.com](https://rentalsinsight.com). This web app is built using ReactJS and initialized using Vite. This app uses TailwindCSS for styling and connects to the [backend](https://github.com/k-laz/ri-api).
 
 ## Technologies
 
